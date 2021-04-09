@@ -32,7 +32,7 @@ kernel_options() {
             output ""
             ;;
         * ) output "You did not enter a valid selection."
-            theme_options
+            kernel_options
     esac
 }
 
