@@ -6,6 +6,36 @@ clear
 # Exit on STDERR.
 set -e
 
+kernel_options() {
+    echo "Which kernel flavor would you want?"
+    echo "[1] Stable — Vanilla Linux kernel and modules, with a few patches applied."
+    echo "[2] Hardened — A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than Stable."
+    echo "[3] Longterm — Long-term support (LTS) Linux kernel and modules."
+    echo "[4] Zen Kernel — Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems. Some more details can be found on https://liquorix.net (which provides kernel binaries based on Zen for Debian)."
+    output ""
+    read choice
+    case $choice in
+        1 ) KERNEL=linux
+            output "You have selected to install the vanilla Linux kernel."
+            output ""
+            ;;
+        2 ) KERNEL=linux-hardened
+            output "You have selected to install the hardened kernel."
+            output ""
+            ;;
+        3 ) KERNEL=linux-lts
+            output "You have selected to install the long term kernel."
+            output ""
+            ;;
+        4 ) KERNEL=linux-zen
+            output "You have selected to install the Zen kernel."
+            output ""
+            ;;
+        * ) output "You did not enter a valid selection."
+            kernel_options
+    esac
+}
+
 # Selecting the target for the installation.
 PS3="Select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme");
@@ -78,7 +108,7 @@ mount $ESP /mnt/boot
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base linux linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo neovim networkmanager &>/dev/null
+pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo neovim networkmanager &>/dev/null
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
