@@ -1,5 +1,5 @@
 ### Introduction
-[easy-arch](https://github.com/classy-giraffe/easy-arch) is a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process.
+This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch) is a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process.
 
 ### How does it work?
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
@@ -13,12 +13,13 @@
 
 | Partition Number | Label     | Size              | Mountpoint | Filesystem             |
 |------------------|-----------|-------------------|------------|------------------------|
-| 1                | ESP       | 512 MiB           | /boot      | FAT32                  |
+| 1                | ESP       | 512 MiB           | /boot/efi  | FAT32                  |
 | 2                | Cryptroot | Rest of the disk  | /          | BTRFS Encrypted (LUKS) |
 
 The **partitions layout** is pretty straightforward, it's inspired by [this section](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Btrfs_subvolumes_with_swap) of the Arch Wiki. As you can see there's just a couple of partitions:
 1. A **FAT32**, 512MiB sized, mounted at `/boot` for the ESP.
 2. A **LUKS encrypted container**, which takes the rest of the disk space, mounted at `/` for the rootfs.
+3. /boot is **encrypted**.
 
 ### BTRFS subvolumes layout
 
