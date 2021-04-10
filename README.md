@@ -10,7 +10,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 6. `cd Arch-Setup-Script`
 7. `./install.sh`
 
-### Changes from the original project
+### Changes to the original project
 1. /boot is now encrypted
 2. Added option to select your own kernel flavor
 3. Removed unnecessary mkinitpcio config and packages
