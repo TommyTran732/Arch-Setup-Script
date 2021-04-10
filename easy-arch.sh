@@ -110,7 +110,7 @@ mount $ESP /mnt/boot/efi
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo neovim networkmanager &>/dev/null
+pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager &>/dev/null
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
