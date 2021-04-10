@@ -5,9 +5,10 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch) is a
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
 3. Boot the live environment.
-4. Set the keyboard layout by using `loadkeys`.
-5. Connect to the internet.
-6. Run this `bash <(curl -sL u.nu/ws5e2)`.
+4. Connect to the internet.
+5. `git clone https://github.com/tommytran732/easy-arch/edit/main/README.md`.
+6. `cd easy-arch`
+7. `./easy-arch.sh`
 
 ### Partitions layout 
 
