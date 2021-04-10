@@ -110,7 +110,7 @@ mount $ESP /mnt/boot/efi
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager &>/dev/null
+pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager wpa_supplicant &>/dev/null
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -146,6 +146,9 @@ sed -i -e 's,modconf block filesystems keyboard,keyboard keymap modconf block en
 UUID=$(blkid $Cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS,g" /mnt/etc/default/grub
+echo "" >> /mnt/etc/default/grub
+echo "# Booting with BTRFS subvolume" >> /mnt/etc/default/grub
+echo "GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
 # Creating a swapfile.
 read -r -p "Do you want a swapfile? [y/N]? " response
