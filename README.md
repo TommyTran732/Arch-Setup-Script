@@ -1,14 +1,19 @@
 ### Introduction
-This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch) is a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process.
+This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch),a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process.
 
 ### How does it work?
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
 3. Boot the live environment.
 4. Connect to the internet.
-5. `git clone https://github.com/tommytran732/easy-arch/edit/main/README.md`.
+5. `git clone https://github.com/tommytran732/easy-arch/edit/main/README.md`
 6. `cd easy-arch`
 7. `./easy-arch.sh`
+
+### Changes from the original project
+1. /boot is now encrypted
+2. Added option to select your own kernel flavor
+3. Removed unnecessary mkinitpcio config and packages
 
 ### Partitions layout 
 
