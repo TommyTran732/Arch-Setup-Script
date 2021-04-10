@@ -14,6 +14,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch),a **
 1. /boot is now encrypted
 2. Added option to select your own kernel flavor
 3. Removed unnecessary mkinitpcio config and packages
+4. Improved BTRFS flags
 
 ### Partitions layout 
 
