@@ -15,6 +15,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 2. Added option to select your own kernel flavor
 3. Removed unnecessary mkinitpcio config and packages
 4. Improved BTRFS flags
+5. Enabled AppArmor
 
 ### Partitions layout 
 
