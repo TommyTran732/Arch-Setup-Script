@@ -12,27 +12,47 @@ kernel_options() {
     echo "[2] Hardened — A security-focused Linux kernel applying a set of hardening patches to mitigate kernel and userspace exploits. It also enables more upstream kernel hardening features than Stable."
     echo "[3] Longterm — Long-term support (LTS) Linux kernel and modules."
     echo "[4] Zen Kernel — Result of a collaborative effort of kernel hackers to provide the best Linux kernel possible for everyday systems. Some more details can be found on https://liquorix.net (which provides kernel binaries based on Zen for Debian)."
-    output ""
+    echo ""
     read choice
     case $choice in
         1 ) KERNEL=linux
-            output "You have selected to install the vanilla Linux kernel."
-            output ""
+            echo "You have selected to install the vanilla Linux kernel."
+            echo ""
             ;;
         2 ) KERNEL=linux-hardened
-            output "You have selected to install the hardened kernel."
-            output ""
+            echo "You have selected to install the hardened kernel."
+            echo ""
             ;;
         3 ) KERNEL=linux-lts
-            output "You have selected to install the long term kernel."
-            output ""
+            echo "You have selected to install the long term kernel."
+            echo ""
             ;;
         4 ) KERNEL=linux-zen
-            output "You have selected to install the Zen kernel."
-            output ""
+            echo "You have selected to install the Zen kernel."
+            echo ""
             ;;
-        * ) output "You did not enter a valid selection."
+        * ) echo "You did not enter a valid selection."
             kernel_options
+    esac
+}
+
+cpu_options() {
+    echo "Which brand is your CPU?"
+    echo "[1] Intel"
+    echo "[2] AMD"
+    echo ""
+    read choice
+    case $choice in
+        1 ) CPU=intel-ucode
+            echo "Intel microcode will be installed."
+            echo ""
+            ;;
+        2 ) CPU=amd-ucode
+            echo "AMD microcode will be installed."
+            echo ""
+            ;;
+        * ) echo "You did not enter a valid selection."
+            cpu_options
     esac
 }
 
@@ -61,11 +81,11 @@ fi
 echo "Creating new partition scheme on $DISK."
 parted -s $DISK \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 513MiB \
-    mkpart Cryptroot 513MiB 100% \
+    mkpart ESP fat32 1MiB 301MiB \
+    mkpart cryptroot 301MiB 100% \
 
 ESP="/dev/disk/by-partlabel/ESP"
-Cryptroot="/dev/disk/by-partlabel/Cryptroot"
+Cryptroot="/dev/disk/by-partlabel/cryptroot"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
@@ -93,24 +113,27 @@ btrfs su cr /mnt/@ &>/dev/null
 btrfs su cr /mnt/@boot &>/dev/null
 btrfs su cr /mnt/@home &>/dev/null
 btrfs su cr /mnt/@snapshots &>/dev/null
-btrfs su cr /mnt/@var_log &>/dev/null
+btrfs su cr /mnt/@var &>/dev/null
 btrfs su cr /mnt/@swap &>/dev/null
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,.snapshots,/var/log,swap,boot,/boot/efi}
+mkdir -p /mnt/{home,.snapshots,var,swap,boot}
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache,nodatacow,subvol=@var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache,nodatacow,subvol=@var $BTRFS /mnt/var/
 mount -o nodatacow,subvol=@swap $BTRFS /mnt/swap
+mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
+
+kernel_options
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${KERNEL} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager wpa_supplicant apparmor &>/dev/null
+pacstrap /mnt base base-devel ${KERNEL} ${KERNEL}-headers ${CPU} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager wpa_supplicant apparmor &>/dev/null nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -219,6 +242,20 @@ systemctl enable fstrim.timer --root=/mnt &>/dev/null
 # Enabling NetworkManager service.
 echo "Enabling NetworkManager."
 systemctl enable NetworkManager --root=/mnt &>/dev/null
+
+# Enabling GDM
+systemctl enable gdm --root=/mnt &>/dev/null
+
+# Enabling AppArmor
+systemctl enable apparmor --root=/mnt &>/dev/null
+
+# Enabling Firewalld
+systemctl enable firewalld --root=/mnt &>/dev/null
+
+# Setting umask to 077
+sed -i 's/022/077/g' /etc/profile
+echo "" >> /etc/bash.bashrc
+echo "umask 077" >> /etc/bash.bashrc
 
 # Enabling Snapper automatic snapshots.
 echo "Enabling Snapper."
