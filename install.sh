@@ -150,28 +150,38 @@ sed -i -e "s#root=/dev/mapper/cryptroot#oot=/dev/mapper/cryptroot lsm=lockdown,y
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
+# Adding keyfile to the initramfs to avoid double password.
+dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
+chmod 000 /mnt/root/.root.key &>/dev/null
+cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
+sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
+sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
+
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
     
+    # Setting up timezone.
+    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
+    
     # Setting up clock.
     hwclock --systohc
-
+    
     # Generating locales.
     echo "Generating locales."
     locale-gen &>/dev/null
-
+    
     # Generating a new initramfs.
     echo "Creating a new initramfs."
+    chmod 600 /boot/initramfs-linux* &>/dev/null
     mkinitcpio -P &>/dev/null
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
-
+    
     # Creating grub config file.
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
-
 EOF
 
 # Setting root password.
