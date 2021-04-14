@@ -18,6 +18,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 5. Replaced Snapper with Timeshift (snapper rollback only works nicely with openSUSE's layout and openSUSE's GRUB. Since the current layout works better with Timeshift and we don't have any GRUB package with SUSE's patches on the AUR, I opt in for Timeshift instead.
 6. The entire /var, not /var/log is in its own subvolume. There are more things that should not be included and restore with the main system, such as docker containers and virtual machines.
 7. No @snapshot subvolume, since we are setting this up to use with Timeshift.
+8. Added microcode installation
 
 ### Partitions layout 
 
