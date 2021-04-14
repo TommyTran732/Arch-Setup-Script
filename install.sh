@@ -112,17 +112,15 @@ echo "Creating BTRFS subvolumes."
 btrfs su cr /mnt/@ &>/dev/null
 btrfs su cr /mnt/@boot &>/dev/null
 btrfs su cr /mnt/@home &>/dev/null
-btrfs su cr /mnt/@snapshots &>/dev/null
 btrfs su cr /mnt/@var &>/dev/null
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,.snapshots,var,boot}
+mkdir -p /mnt/{home,var,boot}
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache,compress=zstd,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache,nodatacow,subvol=@var $BTRFS /mnt/var/
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
@@ -187,15 +185,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating a new initramfs."
     mkinitcpio -P &>/dev/null
 
-    # Snapper configuration
-    umount /.snapshots
-    rm -r /.snapshots
-    snapper --no-dbus -c root create-config /
-    btrfs subvolume delete /.snapshots &>/dev/null
-    mkdir /.snapshots
-    mount -a
-    chmod 750 /.snapshots
-
     # Installing GRUB.
     echo "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
@@ -231,11 +220,6 @@ systemctl enable firewalld --root=/mnt &>/dev/null
 sed -i 's/022/077/g' /etc/profile
 echo "" >> /etc/bash.bashrc
 echo "umask 077" >> /etc/bash.bashrc
-
-# Enabling Snapper automatic snapshots.
-echo "Enabling Snapper."
-systemctl enable snapper-timeline.timer --root=/mnt &>/dev/null
-systemctl enable snapper-cleanup.timer --root=/mnt &>/dev/null
 
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
 exit
