@@ -36,8 +36,9 @@ The **partitions layout** is pretty straightforward, it's inspired by [this sect
 | Subvolume Number | Subvolume Name | Mountpoint       |
 |------------------|----------------|------------------|
 | 1                | @              | /                |
-| 2                | @home          | /home            |
-| 3                | @var           | /var             |
+| 2                | @boot          | /boot
+| 3                | @home          | /home            |
+| 4                | @var           | /var             |
 
 The **BTRFS subvolumes layout** follows the traditional and suggested layout used by **Snapper**, you can find it [here](https://wiki.archlinux.org/index.php/Snapper#Suggested_filesystem_layout). I only added a swap subvolume in case you need a swapfile, but it's totally optional. You'll be asked if you want it or not during the script execution. Here's a brief explanation of the **BTRFS layout** I chose:
 1. `@` mounted as `/`.
