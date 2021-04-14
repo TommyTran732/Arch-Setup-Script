@@ -23,7 +23,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 
 | Partition Number | Label     | Size              | Mountpoint | Filesystem             |
 |------------------|-----------|-------------------|------------|------------------------|
-| 1                | ESP       | 512 MiB           | /boot/efi  | FAT32                  |
+| 1                | ESP       | 300 MiB           | /boot/efi  | FAT32                  |
 | 2                | cryptroot | Rest of the disk  | /          | Encrypted BTRFS (LUKS1)|
 
 The **partitions layout** is pretty straightforward, it's inspired by [this section](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Btrfs_subvolumes_with_swap) of the Arch Wiki. As you can see there's just a couple of partitions:
