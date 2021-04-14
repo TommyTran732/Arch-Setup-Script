@@ -132,7 +132,7 @@ cpu_options
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base base-devel ${KERNEL} ${KERNEL}-headers ${CPU} linux-firmware btrfs-progs grub grub-btrfs efibootmgr snapper sudo networkmanager wpa_supplicant apparmor &>/dev/null nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld
+pacstrap /mnt base base-devel ${KERNEL} ${KERNEL}-headers ${CPU} linux-firmware btrfs-progs grub grub-btrfs efibootmgr sudo networkmanager wpa_supplicant apparmor &>/dev/null nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
