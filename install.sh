@@ -152,7 +152,7 @@ echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETE
 
 # Adding keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
-chmod 000 /mnt/root/.root.key &>/dev/null
+chmod 000 /mnt/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
