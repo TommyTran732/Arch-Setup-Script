@@ -1,11 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -e
 
 # Cleaning the TTY.
 clear
 
-# Exit on STDERR.
-set -e
-
+# Selecting the kernel flavor to install
 kernel_options() {
     echo "Which kernel flavor would you want?"
     echo "[1] Stable — Vanilla Linux kernel and modules, with a few patches applied."
@@ -36,6 +34,7 @@ kernel_options() {
     esac
 }
 
+# Selecting the microcode to install
 cpu_options() {
     echo "Which brand is your CPU?"
     echo "[1] Intel"
