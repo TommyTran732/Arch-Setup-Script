@@ -15,7 +15,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 2. Added option to select your own kernel flavor
 3. Enabled AppArmor
 4. Removed swap partition (I will add zram auto config later)
-5. Replaced Snapper with Timeshift (snapper rollback only works nicely with openSUSE's layout and openSUSE's GRUB. Since the current layout works better with tTmeshift and we don't have any GRUB package with SUSE's patches on the AUR, I opt in for Timeshift instead.
+5. Replaced Snapper with Timeshift (snapper rollback only works nicely with openSUSE's layout and openSUSE's GRUB. Since the current layout works better with Timeshift and we don't have any GRUB package with SUSE's patches on the AUR, I opt in for Timeshift instead.
 6. The entire /var, not /var/log is in its own subvolume. There are more things that should not be included and restore with the main system, such as docker containers and virtual machines.
 
 ### Partitions layout 
