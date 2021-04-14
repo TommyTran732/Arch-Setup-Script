@@ -114,22 +114,21 @@ btrfs su cr /mnt/@boot &>/dev/null
 btrfs su cr /mnt/@home &>/dev/null
 btrfs su cr /mnt/@snapshots &>/dev/null
 btrfs su cr /mnt/@var &>/dev/null
-btrfs su cr /mnt/@swap &>/dev/null
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,.snapshots,var,swap,boot}
+mkdir -p /mnt/{home,.snapshots,var,boot}
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache,nodatacow,subvol=@var $BTRFS /mnt/var/
-mount -o nodatacow,subvol=@swap $BTRFS /mnt/swap
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
 kernel_options
+cpu_options
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
@@ -173,30 +172,6 @@ sed -i -e "s#root=/dev/mapper/cryptroot#oot=/dev/mapper/cryptroot lsm=lockdown,y
 echo "" >> /mnt/etc/default/grub
 echo "# Booting with BTRFS subvolume" >> /mnt/etc/default/grub
 echo "GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
-
-# Creating a swapfile.
-read -r -p "Do you want a swapfile? [y/N]? " response
-response=${response,,}
-if [[ "$response" =~ ^(yes|y)$ ]]
-then
-    read -r -p "How much big should the swap file be? Type the size, just a number (eg: 1 = 1GB..): " swap
-    truncate -s 0 /mnt/swap/swapfile
-    chattr +C /mnt/swap/swapfile
-    btrfs property set /mnt/swap/swapfile compression none &>/dev/null
-    dd if=/dev/zero of=/mnt/swap/swapfile bs=1G count=$swap &>/dev/null
-    chmod 600 /mnt/swap/swapfile
-    mkswap /mnt/swap/swapfile &>/dev/null
-    swapon /mnt/swap/swapfile &>/dev/null
-    echo "/swap/swapfile    none    swap    defaults    0   0" >> /mnt/etc/fstab
-else
-    # Removing swap subvolumes and fstab entry in case it's not needed.
-    echo "Deleting BTRFS swap subvolume."
-    mount $BTRFS -o subvolid=5 /home
-    head -n -4 /home/@/etc/fstab > /home/@/etc/new_fstab && mv /home/@/etc/new_fstab /home/@/etc/fstab
-    btrfs su de /home/@swap &>/dev/null
-    umount -R /home
-    echo "No swapfile has been added."
-fi
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
