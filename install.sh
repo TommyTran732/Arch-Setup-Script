@@ -125,6 +125,8 @@ mount -o ssd,noatime,space_cache,nodatacow,subvol=@var $BTRFS /mnt/var/
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
+chattr +C /mnt/var
+
 kernel_options
 cpu_options
 
