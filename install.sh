@@ -228,7 +228,6 @@ fs.protected_hardlinks = 1
 fs.protected_symlinks = 1
 net.core.bpf_jit_harden = 2
 kernel.yama.ptrace_scope = 3
-module.sig_enforce = 1
 EOF
 
 #Blacklist Firewire SBP2
