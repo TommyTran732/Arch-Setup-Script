@@ -19,6 +19,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 6. Default umask to 077
 7. Firewalld is enabled by default
 8. Improved kernel settings for better security
+9. Minimally setup GNOME 40
 
 ### Partitions layout 
 
