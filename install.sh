@@ -110,7 +110,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware btrfs-progs grub grub-btrfs efibootmgr sudo networkmanager apparmor &>/dev/null nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld
+pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware btrfs-progs grub grub-btrfs efibootmgr sudo networkmanager apparmor pipewire nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld 
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
