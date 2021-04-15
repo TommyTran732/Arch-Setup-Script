@@ -146,7 +146,7 @@ sed -i -e 's,modconf block filesystems keyboard,keyboard keymap modconf block en
 UUID=$(blkid $Cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS,g" /mnt/etc/default/grub
-sed -i -e "s#root=/dev/mapper/cryptroot#root=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf lockdown=integrity#g" /mnt/etc/default/grub
+sed -i -e "s#root=/dev/mapper/cryptroot#root=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf#g" /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
