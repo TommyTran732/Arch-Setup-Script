@@ -206,9 +206,9 @@ systemctl enable apparmor --root=/mnt &>/dev/null
 systemctl enable firewalld --root=/mnt &>/dev/null
 
 # Setting umask to 077
-sed -i 's/022/077/g' /etc/profile
-echo "" >> /etc/bash.bashrc
-echo "umask 077" >> /etc/bash.bashrc
+sed -i 's/022/077/g' /mnt/etc/profile
+echo "" >> /mnt/etc/bash.bashrc
+echo "umask 077" >> /mnt/etc/bash.bashrc
 
 #Security kernel settings
 sudo bash -c 'cat > /mnt/etc/sysctl.d/51-dmesg-restrict.conf' <<-'EOF'
@@ -230,6 +230,9 @@ net.core.bpf_jit_harden = 2
 kernel.yama.ptrace_scope = 3
 module.sig_enforce = 1
 EOF
+
+#Blacklist Firewire SBP2
+echo "blacklist firewire-sbp2" | sudo tee /mnt/etc/modprobe.d/blacklist.conf
 
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
 exit
