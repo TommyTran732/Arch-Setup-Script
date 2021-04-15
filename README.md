@@ -18,6 +18,7 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 5. No @snapshot subvolume, since we are setting this up to use with Timeshift.
 6. Default umask to 077
 7. Firewalld is enabled by default
+8. Improved kernel settings for better security
 
 ### Partitions layout 
 
