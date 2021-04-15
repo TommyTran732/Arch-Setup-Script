@@ -146,7 +146,7 @@ sed -i -e 's,modconf block filesystems keyboard,keyboard keymap modconf block en
 UUID=$(blkid $Cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS,g" /mnt/etc/default/grub
-sed -i -e "s#root=/dev/mapper/cryptroot#oot=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf#g" /mnt/etc/default/grub
+sed -i -e "s#root=/dev/mapper/cryptroot#root=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf lockdown=confidentiality#g" /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
@@ -209,6 +209,27 @@ systemctl enable firewalld --root=/mnt &>/dev/null
 sed -i 's/022/077/g' /etc/profile
 echo "" >> /etc/bash.bashrc
 echo "umask 077" >> /etc/bash.bashrc
+
+#Security kernel settings
+sudo bash -c 'cat > /mnt/etc/sysctl.d/51-dmesg-restrict.conf' <<-'EOF'
+kernel.dmesg_restrict = 1
+EOF
+
+sudo bash -c 'cat > /mnt/etc/sysctl.d/51-kptr-restrict.conf' <<-'EOF'
+kernel.kptr_restrict = 2
+EOF
+
+sudo bash -c 'cat > /mnt/etc/sysctl.d/51-kexec-restrict.conf' <<-'EOF'
+kernel.kexec_load_disabled = 1
+EOF
+
+sudo bash -c 'cat > /mnt/etc/sysctl.d/10-security.conf' <<-'EOF'
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+net.core.bpf_jit_harden = 2
+kernel.yama.ptrace_scope = 3
+module.sig_enforce = 1
+EOF
 
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
 exit
