@@ -61,10 +61,10 @@ echo "Creating new partition scheme on $DISK."
 parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 101MiB \
-    mkpart Cryptroot 101MiB 100% \
+    mkpart cryptroot 101MiB 100% \
 
 ESP="/dev/disk/by-partlabel/ESP"
-Cryptroot="/dev/disk/by-partlabel/cryptroot"
+cryptroot="/dev/disk/by-partlabel/cryptroot"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
@@ -76,9 +76,9 @@ mkfs.fat -F 32 $ESP &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
-cryptsetup --type luks1 luksFormat $Cryptroot
+cryptsetup --type luks1 luksFormat $cryptroot
 echo "Opening the newly created LUKS Container."
-cryptsetup open $Cryptroot cryptroot
+cryptsetup open $cryptroot cryptroot
 BTRFS="/dev/mapper/cryptroot"
 
 # Formatting the LUKS Container as BTRFS.
@@ -144,7 +144,7 @@ sed -i -e 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
 sed -i -e 's,modconf block filesystems keyboard,keyboard keymap modconf block encrypt filesystems,g' /mnt/etc/mkinitcpio.conf
 
 # Enabling LUKS in GRUB and setting the UUID of the LUKS container.
-UUID=$(blkid $Cryptroot | cut -f2 -d'"')
+UUID=$(blkid $cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS,g" /mnt/etc/default/grub
 sed -i -e "s#root=/dev/mapper/cryptroot#root=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf#g" /mnt/etc/default/grub
