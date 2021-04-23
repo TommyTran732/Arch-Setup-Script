@@ -142,8 +142,7 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BT
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/tmp
-chmod 1777 /mnt/var/tmp
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/spool
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
