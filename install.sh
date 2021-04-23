@@ -95,8 +95,9 @@ btrfs subvolume create /mnt/@/.snapshots/1/snapshot &>/dev/null
 btrfs subvolume create /mnt/@/boot &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
-btrfs subvolume create /mnt/@/var &>/dev/null
-chattr +C /mnt/@/var
+btrfs subvolume create /mnt/@/var_log &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
+chattr +C /mnt/@/var_log
 btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
 
 # Mounting the newly created subvolumes.
@@ -108,7 +109,8 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var $BTRFS /mnt/var
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
@@ -160,7 +162,8 @@ echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETE
 dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
-sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
+#I also remove the quiet flag here, since not having any sort of output is a pain
+sed -i -e "s,quiet,cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 # Security kernel settings.
