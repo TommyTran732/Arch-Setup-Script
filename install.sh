@@ -119,9 +119,11 @@ btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/s
 cat << EOF >> /mnt/@/.snapshots/1/info.xml
 <?xml version="1.0"?>
 <snapshot>
-   <type>single</type>
-   <num>1</num>
-   <description>First Root Filesystem</description>
+  <type>single</type>
+  <num>1</num>
+  <date>1999-03-31 0:00:00</date>
+  <description>First Root Filesystem</description>
+  <cleanup>number</cleanup>
 </snapshot>
 EOF
 
@@ -153,7 +155,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base base-devel ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld 
+pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld 
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -206,11 +208,11 @@ sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
 echo "kernel.kptr_restrict = 2" > /mnt/etc/sysctl.d/51-kptr-restrict.conf
 echo "kernel.kexec_load_disabled = 1" > /mnt/etc/sysctl.d/51-kexec-restrict.conf
 cat << EOF >> /mnt/etc/sysctl.d/10-security.conf
-    fs.protected_hardlinks = 1
-    fs.protected_symlinks = 1
-    net.core.bpf_jit_harden = 2
-    kernel.yama.ptrace_scope = 3
-    kernel.unprivileged_userns_clone = 1
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+net.core.bpf_jit_harden = 2
+kernel.yama.ptrace_scope = 3
+kernel.unprivileged_userns_clone = 1
 EOF
 
 # Configuring the system.    
