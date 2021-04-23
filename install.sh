@@ -58,10 +58,10 @@ fi
 
 # Creating a new partition scheme.
 echo "Creating new partition scheme on $DISK."
-parted -s $DISK \
+parted -s "$DISK" \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 301MiB \
-    mkpart cryptroot 301MiB 100% \
+    mkpart ESP fat32 1MiB 101MiB \
+    mkpart Cryptroot 101MiB 100% \
 
 ESP="/dev/disk/by-partlabel/ESP"
 Cryptroot="/dev/disk/by-partlabel/cryptroot"
@@ -91,20 +91,21 @@ echo "Creating BTRFS subvolumes."
 btrfs su cr /mnt/@ &>/dev/null
 btrfs su cr /mnt/@boot &>/dev/null
 btrfs su cr /mnt/@home &>/dev/null
-btrfs su cr /mnt/@var &>/dev/null
+btrfs su cr /mnt/@snapshots &>/dev/null
+btrfs su cr /mnt/@var_log &>/dev/null
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,var,boot}
-mount -o ssd,noatime,space_cache,compress=zstd,subvol=@boot $BTRFS /mnt/boot
-mount -o ssd,noatime,space_cache,compress=zstd,subvol=@home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache,nodatacow,subvol=@var $BTRFS /mnt/var/
-mkdir -p /mnt/boot/efi
+mkdir -p /mnt/{home,.snapshots,/var/log,boot}
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@boot $BTRFS /mnt/boot
+mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache,nodatacow,subvol=@var_log $BTRFS /mnt/var/log
+chattr +C /mnt/var/log
+mkdir /mnt/boot/efi
 mount $ESP /mnt/boot/efi
-
-chattr +C /mnt/var
 
 kernel_selector
 
@@ -156,6 +157,16 @@ chmod 000 /mnt/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
 sed -i -e "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
+
+# Security kernel settings.
+echo "kernel.kptr_restrict = 2" > /mnt/etc/sysctl.d/51-kptr-restrict.conf
+echo "kernel.kexec_load_disabled = 1" > /mnt/etc/sysctl.d/51-kexec-restrict.conf
+cat << EOF >> /mnt/etc/sysctl.d/10-security.conf
+    fs.protected_hardlinks = 1
+    fs.protected_symlinks = 1
+    net.core.bpf_jit_harden = 2
+    kernel.yama.ptrace_scope = 3
+EOF
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
@@ -209,26 +220,6 @@ systemctl enable firewalld --root=/mnt &>/dev/null
 sed -i 's/022/077/g' /mnt/etc/profile
 echo "" >> /mnt/etc/bash.bashrc
 echo "umask 077" >> /mnt/etc/bash.bashrc
-
-#Security kernel settings
-sudo bash -c 'cat > /mnt/etc/sysctl.d/51-dmesg-restrict.conf' <<-'EOF'
-kernel.dmesg_restrict = 1
-EOF
-
-sudo bash -c 'cat > /mnt/etc/sysctl.d/51-kptr-restrict.conf' <<-'EOF'
-kernel.kptr_restrict = 2
-EOF
-
-sudo bash -c 'cat > /mnt/etc/sysctl.d/51-kexec-restrict.conf' <<-'EOF'
-kernel.kexec_load_disabled = 1
-EOF
-
-sudo bash -c 'cat > /mnt/etc/sysctl.d/10-security.conf' <<-'EOF'
-fs.protected_hardlinks = 1
-fs.protected_symlinks = 1
-net.core.bpf_jit_harden = 2
-kernel.yama.ptrace_scope = 3
-EOF
 
 #Blacklist Firewire SBP2
 echo "blacklist firewire-sbp2" | sudo tee /mnt/etc/modprobe.d/blacklist.conf
