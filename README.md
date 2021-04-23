@@ -30,7 +30,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 5. Firewalld is enabled by default
 6. Minimally setup GNOME 40
 
-### Why a bunch of @var_xxx subvolumes?
+### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
 stores its database in /var/lib/pacman/local, which needs to be excluded and rolled back accordingly to the rest of the system.
 
