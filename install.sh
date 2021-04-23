@@ -210,6 +210,7 @@ cat << EOF >> /mnt/etc/sysctl.d/10-security.conf
     fs.protected_symlinks = 1
     net.core.bpf_jit_harden = 2
     kernel.yama.ptrace_scope = 3
+    kernel.unprivileged_userns_clone = 1
 EOF
 
 # Configuring the system.    
@@ -243,13 +244,13 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Installing GRUB.
     echo "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
-    sed -i 's#"rootflags=subvol=${rootsubvol}"##g' /etc/grub.d/10_linux
-    sed -i 's#"rootflags=subvol=${rootsubvol}"##g' /etc/grub.d/20_linux_xen
-    #pacman -S --noconfirm snap-pac
+    sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux
+    sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen
     
     # Creating grub config file.
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+    pacman -S --noconfirm snap-pac
 EOF
 
 # Setting root password.
