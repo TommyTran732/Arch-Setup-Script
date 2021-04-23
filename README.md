@@ -60,12 +60,6 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 | 15                  | @/var_lib_AccountService     | /var/lib/AccountsService | Encrypted BTRFS             |
 | 16                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
 
-
-The **partitions layout** is pretty straightforward, it's inspired by [this section](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Btrfs_subvolumes_with_swap) of the Arch Wiki. As you can see there's just a couple of partitions:
-1. A **FAT32**, 100MiB sized, mounted at `/boot/efi` for the ESP.
-2. A **LUKS encrypted container**, which takes the rest of the disk space, mounted at `/` for the rootfs.
-3. /boot is **encrypted**.
-
 ### To do
 1. Automate wheel user setup
 2. Install yay and setup plymouth, hardened_malloc, opensnitch, zram-generator
