@@ -90,8 +90,9 @@ mount $BTRFS /mnt
 echo "Creating BTRFS subvolumes."
 btrfs subvolume create /mnt/@ &>/dev/null
 btrfs subvolume create /mnt/@/.snapshots &>/dev/null
-mkdir /mnt/@/.snapshots/0 &>/dev/null
+mkdir -p /mnt/@/.snapshots/1 &>/dev/null
 btrfs subvolume create /mnt/@/.snapshots/1/snapshot &>/dev/null
+mkdir -p /mnt/@/boot
 btrfs subvolume create /mnt/@/boot/grub/ &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
@@ -113,8 +114,19 @@ chattr +C /mnt/@/var_crash
 chattr +C /mnt/@/var_cache
 chattr +C /mnt/@/var_tmp
 chattr +C /mnt/@/var_spool
-chattr +C /mnt/@/var_lib_libvirt_iamges
+chattr +C /mnt/@/var_lib_libvirt_images
 btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
+
+cat << EOF >> /mnt/@/.snapshots/1/info.xml
+<?xml version="1.0"?>
+<snapshot>
+   <type>single</type>
+   <num>1</num>
+   <description>First Root Filesystem</description>
+</snapshot>
+EOF
+
+chmod 600 /mnt/@/.snapshots/1/info.xml
 
 # Mounting the newly created subvolumes.
 umount /mnt
@@ -137,6 +149,8 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsServi
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
+
+
 
 kernel_selector
 
@@ -232,8 +246,9 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Installing GRUB.
     echo "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
-    sed -i 's#"rootflags=subvol=${rootsubvol}##g' /etc/grub.d/10_linux
-    sed -i 's#"rootflags=subvol=${rootsubvol}##g' /etc/grub.d/20_linux_xen
+    sed -i 's#"rootflags=subvol=${rootsubvol}"##g' /etc/grub.d/10_linux
+    sed -i 's#"rootflags=subvol=${rootsubvol}"##g' /etc/grub.d/20_linux_xen
+    pacman -S --noconfirm snap-pac
     
     # Creating grub config file.
     echo "Creating GRUB config file."
