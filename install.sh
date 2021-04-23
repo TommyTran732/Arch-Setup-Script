@@ -101,12 +101,14 @@ btrfs subvolume create /mnt/@/var_cache &>/dev/null
 btrfs subvolume create /mnt/@/var_tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
-btrfs subvolume create /mnt/@/AccountsService &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
 chattr +C /mnt/@/var_log
 chattr +C /mnt/@/var_crash
 chattr +C /mnt/@/var_cache
 chattr +C /mnt/@/var_tmp
 chattr +C /mnt/@/var_spool
+chattr +C /mnt/@/var_lib_libvirt_iamges
 btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
 
 # Mounting the newly created subvolumes.
@@ -125,6 +127,7 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BT
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
