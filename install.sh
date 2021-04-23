@@ -95,6 +95,8 @@ btrfs subvolume create /mnt/@/.snapshots/1/snapshot &>/dev/null
 btrfs subvolume create /mnt/@/boot/grub/ &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
+btrfs subvolume create /mnt/@/srv &>/dev/null
+btrfs subvolume create /mnt/@/tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_log &>/dev/null
 btrfs subvolume create /mnt/@/var_crash &>/dev/null
 btrfs subvolume create /mnt/@/var_cache &>/dev/null
@@ -103,6 +105,8 @@ btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
+chattr +C /mnt/@/srv
+chattr +C /mnt/@/tmp
 chattr +C /mnt/@/var_log
 chattr +C /mnt/@/var_crash
 chattr +C /mnt/@/var_cache
@@ -115,11 +119,13 @@ btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/s
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{/boot/grub,root,home,.snapshots,/var/log,/var/cache,/var/tmp,/var/crash,/var/lib/gdm,/var/lib/AccountsService}
+mkdir -p /mnt/{/boot/grub,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/boot/grub $BTRFS /mnt/boot/grub
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/srv $BTRFS /mnt/tmp
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
