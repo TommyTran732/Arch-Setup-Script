@@ -96,25 +96,29 @@ btrfs subvolume create /mnt/@/boot &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
 btrfs subvolume create /mnt/@/var_log &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
+chattr +C /mnt/@/var_log
+btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/0/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,.snapshots,/var/log,boot}
+mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
+mkdir -p /mnt/{boot,root,home,.snapshots,/var/log,/var/lib/gdm}
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/boot $BTRFS /mnt/boot
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
-chattr +C /mnt/var/log
-mkdir /mnt/boot/efi
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
+mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
-btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/0/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
+
 kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware btrfs-progs grub grub-btrfs snapper snap-pac os-prober efibootmgr sudo networkmanager apparmor pipewire nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld 
+pacstrap /mnt base base-devel ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-tweaks nautilus flatpak xdg-user-dirs firewalld 
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -188,6 +192,16 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating a new initramfs."
     chmod 600 /boot/initramfs-linux* &>/dev/null
     mkinitcpio -P &>/dev/null
+
+    # Snapper configuration
+    umount /.snapshots
+    rm -r /.snapshots
+    snapper --no-dbus -c root create-config /
+    btrfs subvolume delete /.snapshots
+    mkdir /.snapshots
+    mount -a
+    chmod 750 /.snapshots
+    systemctl enable grub-btrfs.path
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
