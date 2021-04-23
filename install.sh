@@ -96,21 +96,31 @@ btrfs subvolume create /mnt/@/boot &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
 btrfs subvolume create /mnt/@/var_log &>/dev/null
+btrfs subvolume create /mnt/@/var_crash &>/dev/null
+btrfs subvolume create /mnt/@/var_cache &>/dev/null
+btrfs subvolume create /mnt/@/var_tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
 chattr +C /mnt/@/var_log
+chattr +C /mnt/@/var_crash
+chattr +C /mnt/@/var_cache
+chattr +C /mnt/@/var_tmp
 btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,/var/}
+mkdir -p /mnt/{boot,root,home,.snapshots,/var/log,/var/cache,/var/tmp,/var/crash,/var/lib/gdm,/var/lib/AccountsService}
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/tmp
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
+mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt//var/lib/AccountsService
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
