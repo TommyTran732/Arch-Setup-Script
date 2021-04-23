@@ -109,7 +109,7 @@ mount -o ssd,noatime,space_cache,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
 chattr +C /mnt/var/log
 mkdir /mnt/boot/efi
 mount $ESP /mnt/boot/efi
-
+btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/0/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
 kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
