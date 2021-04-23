@@ -105,6 +105,7 @@ btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
+chattr +C /mnt/@/boot/grub
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/tmp
 chattr +C /mnt/@/var_log
@@ -120,7 +121,7 @@ umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
 mkdir -p /mnt/{/boot/grub,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/boot/grub $BTRFS /mnt/boot/grub
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/boot/grub $BTRFS /mnt/boot/grub
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
@@ -146,6 +147,7 @@ pacstrap /mnt base base-devel ${kernel} ${microcode} linux-firmware grub grub-bt
 # Generating /etc/fstab.
 echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
+sed -i 's#subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
 # Setting hostname.
 read -r -p "Please enter the hostname: " hostname
