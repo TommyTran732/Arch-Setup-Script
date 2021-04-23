@@ -150,8 +150,6 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_libvirt_image
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
-
-
 kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
