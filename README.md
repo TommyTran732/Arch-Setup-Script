@@ -12,13 +12,11 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 
 ### Changes to the original project
 1. Enabled AppArmor
-2. Removed swap partition (I will add zram auto config later)
-3. Replaced Snapper with Timeshift (snapper rollback only works nicely with openSUSE's layout and openSUSE's GRUB. Since the current layout works better with Timeshift and we don't have any GRUB package with SUSE's patches on the AUR, I opt in for Timeshift instead.
-4. No @snapshot subvolume, since we are setting this up to use with Timeshift.
-5. Default umask to 077
-6. Firewalld is enabled by default
-7. Improved kernel settings for better security
-8. Minimally setup GNOME 40
+2. SUSE - like partition layout
+3. Default umask to 077
+4. Firewalld is enabled by default
+5. Improved kernel settings for better security
+6. Minimally setup GNOME 40
 
 ### Partitions layout 
 
@@ -31,18 +29,3 @@ The **partitions layout** is pretty straightforward, it's inspired by [this sect
 1. A **FAT32**, 512MiB sized, mounted at `/boot/efi` for the ESP.
 2. A **LUKS encrypted container**, which takes the rest of the disk space, mounted at `/` for the rootfs.
 3. /boot is **encrypted**.
-
-### BTRFS subvolumes layout
-
-| Subvolume Number | Subvolume Name | Mountpoint       |
-|------------------|----------------|------------------|
-| 1                | @              | /                |
-| 2                | @boot          | /boot            |
-| 3                | @home          | /home            |
-| 4                | @var_lo        | /var/log         |
-
-The **BTRFS subvolumes layout** follows the traditional and suggested layout used by **Snapper**, you can find it [here](https://wiki.archlinux.org/index.php/Snapper#Suggested_filesystem_layout). Here's a brief explanation of the **BTRFS layout** I chose:
-1. `@` mounted as `/`.
-2. `@boot` mounted as `/boot`.
-3. `@home` mounted as `/home`.
-4. `@var` mounted as `/var`.
