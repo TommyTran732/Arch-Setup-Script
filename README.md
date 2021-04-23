@@ -20,6 +20,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 3. Automatic snapshots on pacman install/update operations
 4. /boot/grub and /boot/efi are 2 seperate subvolumes which will not be rolled back with snapper. The kernel and initramfs are part of the snapshot. 
 5. For consistency with pacman's database, I deviate from SUSE's partition layout leave /usr/local/ and /opt as part of the snapshot. When you rollback, everything in those 2 directories rollback as well.
+6. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
 
 ### Changes to the original project
 1. Enabled AppArmor
@@ -40,10 +41,25 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 
 ### Partitions layout 
 
-| Partition Number | Label     | Size              | Mountpoint | Filesystem             |
-|------------------|-----------|-------------------|------------|------------------------|
-| 1                | ESP       | 100 MiB           | /boot/efi  | FAT32                  |
-| 2                | cryptroot | Rest of the disk  | /          | Encrypted BTRFS (LUKS1)|
+| Partition/Subvolume | Label                        | Mountpoint               | Notes                       |
+|---------------------|------------------------------|--------------------------|-----------------------------|
+| 1                   | ESP                          | /boot/efi                | Unencrypted FAT32           |
+| 2                   | @/.snapshots/X/snapshot      | /                        | Encrypted BTRFS             |
+| 3                   | @/grub                       | /boot/grub               | Encrypted BTRFS (nodatacow) |
+| 4                   | @/root                       | /root                    | Encrypted BTRFS             |
+| 5                   | @/home                       | /home                    | Encrypted BTRFS             |
+| 6                   | @/.snapshots                 | /.snapshots              | Encrypted BTRFS             |
+| 7                   | @/srv                        | /srv                     | Encrypted BTRFS (nodatacow) |
+| 8                   | @/tmp                        | /tmp                     | Encrypted BTRFS (nodatacow) |
+| 9                   | @/var_log                    | /var/log                 | Encrypted BTRFS (nodatacow) |
+| 10                  | @/var_crash                  | /var/crash               | Encrypted BTRFS (nodatacow) |
+| 11                  | @/var_cache                  | /var/cache               | Encrypted BTRFS (nodatacow) |
+| 12                  | @/var_tmp                    | /var/tmp                 | Encrypted BTRFS (nodatacow) |
+| 13                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
+| 14                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS             |
+| 15                  | @/var_lib_AccountService     | /var/lib/AccountsService | Encrypted BTRFS             |
+| 16                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
+
 
 The **partitions layout** is pretty straightforward, it's inspired by [this section](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Btrfs_subvolumes_with_swap) of the Arch Wiki. As you can see there's just a couple of partitions:
 1. A **FAT32**, 100MiB sized, mounted at `/boot/efi` for the ESP.
