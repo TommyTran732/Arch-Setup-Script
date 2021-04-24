@@ -37,7 +37,7 @@ stores its database in /var/lib/pacman/local, which needs to be excluded and rol
 Other than that, /var/lib/gdm and /var/lib/AccountsService must have their own read-write subvolume in order to boot GNOME from a read only snapshot.
 
 ### Why GNOME?
-I only use GNOME and I know that I have to explicitly create a seperate a subvolume for /var/lib/gdm, /var/cache, /var/tpm and so on for a full desktop to boot from a read-only snapshot. I don't know how other desktop environments behave and which directories we need to create a seperate subvolume for. We will also change the partitioning scheme according to the DE selection as well, since it doesn't make any sense to create @var_lib_gdm on a KDE system. Any help with adding more DE options would be appreciated.
+I only use GNOME and I know that I have to explicitly create a seperate a subvolume for /var/lib/gdm, /var/cache, /var/tmp and so on for a full desktop to boot from a read-only snapshot. I don't know how other desktop environments behave and which directories we need to create a seperate subvolume for. We will also change the partitioning scheme according to the DE selection as well, since it doesn't make any sense to create @var_lib_gdm on a KDE system. Any help with adding more DE options would be appreciated.
 
 ### Partitions layout 
 
