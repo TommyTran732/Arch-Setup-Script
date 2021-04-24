@@ -161,7 +161,7 @@ pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-fir
 # Generating /etc/fstab.
 echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
-sed -i 's#subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
+sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
 # Setting hostname.
 read -r -p "Please enter the hostname: " hostname
