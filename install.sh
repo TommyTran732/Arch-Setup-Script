@@ -148,7 +148,7 @@ mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BT
 mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
+mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
