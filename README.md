@@ -29,6 +29,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 4. Default umask to 077
 5. Firewalld is enabled by default
 6. Minimally setup GNOME 40
+7. Better mount options
 
 ### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
