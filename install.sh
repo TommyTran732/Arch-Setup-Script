@@ -135,20 +135,20 @@ umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
 mkdir -p /mnt/{/boot/grub,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
-mount -o ssd,noatime,space_cache,compress=zstd:15,,subvol=@/grub $BTRFS /mnt/boot/grub
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
-mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/srv $BTRFS /mnt/srv
-mount -o ssd,noatime,space_cache.compress=zstd:15,subvol=@/srv $BTRFS /mnt/tmp
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/tmp
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
-mount -o ssd,noatime,space_cache,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
-mount -o ssd,noatime,space_cache,compress=zstd:15,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,,subvol=@/grub $BTRFS /mnt/boot/grub
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,subvol=@/root $BTRFS /mnt/root 
+mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,subvol=@/home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,subvol=@/.snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,subvol=@/srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,subvol=@/srv $BTRFS /mnt/tmp
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/tmp
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
