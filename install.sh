@@ -192,7 +192,6 @@ sed -i 's,modconf block filesystems keyboard,keyboard modconf block encrypt file
 # Enabling LUKS in GRUB and setting the UUID of the LUKS container.
 UUID=$(blkid $cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
-sed -i "s/quiet/quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf/g" /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
@@ -201,7 +200,7 @@ dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
 #I also remove the quiet flag here, since not having any sort of output is a pain
-sed -i "s,quiet,cryptdevice=UUID=$UUID:cryptroot root=$BTRFS cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
+sed -i "s,quiet,cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 # Security kernel settings.
