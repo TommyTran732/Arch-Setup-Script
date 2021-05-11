@@ -93,7 +93,7 @@ btrfs subvolume create /mnt/@ &>/dev/null
 btrfs subvolume create /mnt/@/.snapshots &>/dev/null
 mkdir -p /mnt/@/.snapshots/1 &>/dev/null
 btrfs subvolume create /mnt/@/.snapshots/1/snapshot &>/dev/null
-btrfs subvolume create /mnt/@/grub/ &>/dev/null
+btrfs subvolume create /mnt/@/boot/ &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
 btrfs subvolume create /mnt/@/srv &>/dev/null
@@ -106,7 +106,7 @@ btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
-chattr +C /mnt/@/grub
+chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/tmp
 chattr +C /mnt/@/var_log
@@ -134,8 +134,8 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{/boot/grub,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/grub $BTRFS /mnt/boot/grub
+mkdir -p /mnt/{/boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
