@@ -12,6 +12,7 @@ This fork comes with various security improvements and fully working rollbacks w
 6. `cd Arch-Setup-Script`
 7. `chmod u+x ./install.sh && ./install.sh`
 8. do `arch-chroot /mnt` and create your wheel user once the script is done. Remember to give the wheel group priviledges in `visudo`.
+9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
