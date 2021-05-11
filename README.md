@@ -18,17 +18,17 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 1. Snapper rollback <number> works! You will no longer need to manually rollback from a live USB like you would with the @ and @home layout suggested in the Arch Wiki.
 2. You can boot into a readonly snapshot! GDM and other services will start normally so you can get in and verify that everything works before rolling back.
 3. Automatic snapshots on pacman install/update operations
-4. /boot/grub and /boot/efi are 2 seperate subvolumes which will not be rolled back with snapper. The kernel and initramfs are part of the snapshot. 
+4. /boot and /boot/efi are 2 seperate subvolumes which will not be rolled back with snapper.
 5. For consistency with pacman's database, I deviate from SUSE's partition layout leave /usr/local/ and /opt as part of the snapshot. When you rollback, everything in those 2 directories rollback as well.
 6. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
 
 ### Changes to the original project
-1. Enabled AppArmor
+1. Encrypted /boot (This was previously present on EasyArch, but Tommaso changed his script to use LUKS2 and have unencrypted /boot. Personally I would not do this, since encrypting /boot is the only way to protect the initramfs from being tampered with. GRUB will only validate the kernel if Secure Boot is used, not the initramfs).
 2. SUSE - like partition layout
 3. Snapper snapshots & rollback
 4. Default umask to 077
 5. Firewalld is enabled by default
-6. Minimally setup GNOME 40
+6. Minimally setup GNOME 40 with pipewire
 7. Better mount options
 
 ### Why so many @var_xxx subvolumes?
@@ -46,7 +46,7 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 |---------------------|------------------------------|--------------------------|-----------------------------|
 | 1                   | ESP                          | /boot/efi                | Unencrypted FAT32           |
 | 2                   | @/.snapshots/X/snapshot      | /                        | Encrypted BTRFS             |
-| 3                   | @/grub                       | /boot/grub               | Encrypted BTRFS (nodatacow) |
+| 3                   | @/boot                       | /boot/                   | Encrypted BTRFS (nodatacow) |
 | 4                   | @/root                       | /root                    | Encrypted BTRFS             |
 | 5                   | @/home                       | /home                    | Encrypted BTRFS             |
 | 6                   | @/.snapshots                 | /.snapshots              | Encrypted BTRFS             |
