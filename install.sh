@@ -255,7 +255,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     pacman -S --noconfirm snap-pac
     
     #Remove unnecessary permissions
-    sudo chmod o-w /var/cache
+    chmod o-w /var/cache
 EOF
 
 # Setting root password.
