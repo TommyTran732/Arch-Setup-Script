@@ -32,6 +32,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 6. Minimally setup GNOME 40 with pipewire
 7. Better mount options
 8. Added more filesystem support (Since Disk Utility is a GNOME dependency and it supports exFAT, NTFS, F2FS and UDF, I added support for those out of the box to make the experience a bit better out of the box)
+9. Randomize Mac Address and disable Connectivity Check for privacy
 
 ### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
@@ -68,6 +69,5 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 2. Install yay and setup hardened_malloc & opensnitch
 3. Reduce the number of password prompts
 4. Automatic secure boot setup with your own keys (no, we are not using shim).
-5. Randomize MAC address
-6. Optional Nvidia driver installation 
-7. Automatic zram setup
+5. Optional Nvidia driver installation 
+6. Automatic zram setup
