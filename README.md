@@ -15,7 +15,7 @@ This fork comes with various security improvements and fully working rollbacks w
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
-1. Snapper rollback <number> works! You will no longer need to manually rollback from a live USB like you would with the @ and @home layout suggested in the Arch Wiki.
+1. Snapper rollback <number> works! You will no longer need to manually rollback from a live USB like you would with the @ and @home layout suggested in the Arch Wiki.f2fs-tools udftools
 2. You can boot into a readonly snapshot! GDM and other services will start normally so you can get in and verify that everything works before rolling back.
 3. Automatic snapshots on pacman install/update operations
 4. /boot and /boot/efi are 2 seperate subvolumes which will not be rolled back with snapper.
@@ -30,6 +30,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 5. Firewalld is enabled by default
 6. Minimally setup GNOME 40 with pipewire
 7. Better mount options
+8. Added more filesystem support (Since Disk Utility is a GNOME dependency and it supports exFAT, NTFS, F2FS and UDF, I added support for those out of the box to make the experience a bit better out of the box)
 
 ### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
