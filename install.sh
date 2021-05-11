@@ -253,6 +253,9 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
     pacman -S --noconfirm snap-pac
+    
+    #Remove unnecessary permissions
+    sudo chmod o-w /var/cache
 EOF
 
 # Setting root password.
