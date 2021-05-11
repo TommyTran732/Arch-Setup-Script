@@ -186,13 +186,13 @@ EOF
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook."
-sed -i "s/quiet/quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf/g" /mnt/etc/default/grub
+sed -i 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
+sed -i 's,modconf block filesystems keyboard,keyboard modconf block encrypt filesystems,g' /mnt/etc/mkinitcpio.conf
 
 # Enabling LUKS in GRUB and setting the UUID of the LUKS container.
 UUID=$(blkid $cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
-sed -i "s,quiet,quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS,g" /mnt/etc/default/grub
-sed -i "s#root=/dev/mapper/cryptroot#root=/dev/mapper/cryptroot lsm=lockdown,yama,apparmor,bpf#g" /mnt/etc/default/grub
+sed -i "s/quiet/quiet cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf/g" /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
