@@ -296,6 +296,9 @@ systemctl enable apparmor --root=/mnt &>/dev/null
 # Enabling Firewalld
 systemctl enable firewalld --root=/mnt &>/dev/null
 
+# Enabling Bluetooth Service (If you don't want bluetooth, disable it with GNOME, don't disable the service)
+systemctl enable bluetooth --root=/mnt &>/dev/null
+
 # Setting umask to 077
 sed -i 's/022/077/g' /mnt/etc/profile
 echo "" >> /mnt/etc/bash.bashrc
