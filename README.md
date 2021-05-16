@@ -12,7 +12,6 @@ This fork comes with various security improvements and fully working rollbacks w
 6. `cd Arch-Setup-Script`
 7. `chmod u+x ./install.sh && ./install.sh`
 8. do `arch-chroot /mnt` and create your wheel user once the script is done. Remember to give the wheel group priviledges in `visudo`.
-9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
@@ -32,6 +31,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 6. Minimally setup GNOME 40 with pipewire
 7. Added more filesystem support (Since Disk Utility is a GNOME dependency and it supports exFAT, NTFS, F2FS and UDF, I added support for those out of the box to make the experience a bit better out of the box)
 8. Randomize Mac Address and disable Connectivity Check for privacy
+9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
 
 ### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
