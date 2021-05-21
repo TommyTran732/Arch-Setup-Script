@@ -65,7 +65,7 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 
 ### To do
 1. Automate wheel user setup
-2. Install yay and setup hardened_malloc & opensnitch
+2. Install yay and setup opensnitch
 3. Reduce the number of password prompts
 4. Automatic secure boot setup with your own keys (no, we are not using shim).
 5. Optional Nvidia driver installation 
