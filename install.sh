@@ -115,7 +115,7 @@ chattr +C /mnt/@/var_cache
 chattr +C /mnt/@/var_tmp
 chattr +C /mnt/@/var_spool
 chattr +C /mnt/@/var_lib_libvirt_images
-btrfs subvolume set-default $(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt
+btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
 cat << EOF >> /mnt/@/.snapshots/1/info.xml
 <?xml version="1.0"?>
