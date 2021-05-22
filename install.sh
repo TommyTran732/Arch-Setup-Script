@@ -223,7 +223,7 @@ ethernet.cloned-mac-address=random
 connection.stable-id=${CONNECTION}/${BOOT}
 EOF
 
-chmod 700 /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
+chmod 600 /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
 
 # Disable Connectivity Check.
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/20-connectivity.conf' <<-'EOF'
@@ -232,7 +232,7 @@ uri=http://www.archlinux.org/check_network_status.txt
 interval=0
 EOF
 
-chmod 700 /mnt/etc/NetworkManager/conf.d/20-connectivity.conf
+chmod 600 /mnt/etc/NetworkManager/conf.d/20-connectivity.conf
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
