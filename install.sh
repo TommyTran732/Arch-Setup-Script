@@ -49,8 +49,8 @@ read -r -p "This will delete the current partition table on $DISK. Do you agree 
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]
 then
-    wipefs -af $DISK &>/dev/null
-    sgdisk -Zo $DISK &>/dev/null
+    wipefs -af "$DISK" &>/dev/null
+    sgdisk -Zo "$DISK" &>/dev/null
 else
     echo "Quitting."
     exit
@@ -69,7 +69,7 @@ cryptroot="/dev/disk/by-partlabel/cryptroot"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
-partprobe $DISK
+partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
 echo "Formatting the EFI Partition as FAT32."
@@ -165,7 +165,7 @@ sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/sn
 
 # Setting hostname.
 read -r -p "Please enter the hostname: " hostname
-echo $hostname > /mnt/etc/hostname
+echo "$hostname" > /mnt/etc/hostname
 
 # Setting up locales.
 read -r -p "Please insert the locale you use in this format (xx_XX): " locale
