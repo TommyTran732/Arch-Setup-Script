@@ -199,7 +199,6 @@ echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETE
 dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
-#I also remove the quiet flag here, since not having any sort of output is a pain
 sed -i "s,quiet,cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
@@ -214,7 +213,7 @@ kernel.yama.ptrace_scope = 3
 kernel.unprivileged_userns_clone = 1
 EOF
 
-# Randomize Mac Address
+# Randomize Mac Address.
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf' <<-'EOF'
 [device]
 wifi.scan-rand-mac-address=yes
@@ -226,7 +225,7 @@ EOF
 
 chmod 700 /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
 
-# Disable Connectivity Check 
+# Disable Connectivity Check.
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/20-connectivity.conf' <<-'EOF'
 [connectivity]
 uri=http://www.archlinux.org/check_network_status.txt
@@ -287,27 +286,27 @@ systemctl enable fstrim.timer --root=/mnt &>/dev/null
 echo "Enabling NetworkManager."
 systemctl enable NetworkManager --root=/mnt &>/dev/null
 
-# Enabling GDM
+# Enabling GDM.
 systemctl enable gdm --root=/mnt &>/dev/null
 
-# Enabling AppArmor
+# Enabling AppArmor.
 systemctl enable apparmor --root=/mnt &>/dev/null
 
-# Enabling Firewalld
+# Enabling Firewalld.
 systemctl enable firewalld --root=/mnt &>/dev/null
 
-# Enabling Bluetooth Service (If you don't want bluetooth, disable it with GNOME, don't disable the service)
+# Enabling Bluetooth Service (If you don't want bluetooth, disable it with GNOME, don't disable the service).
 systemctl enable bluetooth --root=/mnt &>/dev/null
 
-# Enabling Reflector timer
+# Enabling Reflector timer.
 systemctl enable reflector.timer --root=/mnt &>/dev/null
 
-# Setting umask to 077
+# Setting umask to 077.
 sed -i 's/022/077/g' /mnt/etc/profile
 echo "" >> /mnt/etc/bash.bashrc
 echo "umask 077" >> /mnt/etc/bash.bashrc
 
-#Blacklist Firewire SBP2
+#Blacklist Firewire SBP2.
 echo "blacklist firewire-sbp2" | sudo tee /mnt/etc/modprobe.d/blacklist.conf
 
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
