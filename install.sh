@@ -266,8 +266,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Installing GRUB.
     echo "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
-    sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux
-    sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen
+    #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux
+    #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen
     
     # Creating grub config file.
     echo "Creating GRUB config file."
