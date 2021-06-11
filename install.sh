@@ -106,6 +106,7 @@ btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
+btrfs subvolume create /mnt/@/cryptkey &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/tmp
@@ -115,6 +116,7 @@ chattr +C /mnt/@/var_cache
 chattr +C /mnt/@/var_tmp
 chattr +C /mnt/@/var_spool
 chattr +C /mnt/@/var_lib_libvirt_images
+chattr +C /mnt/@/cryptkey
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
 cat << EOF >> /mnt/@/.snapshots/1/info.xml
@@ -134,7 +136,7 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{/boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images}
+mkdir -p /mnt/{/boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/gdm,/var/lib/AccountsService,/var/lib/libvirt/images,/cryptkey}
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/home $BTRFS /mnt/home
@@ -149,6 +151,7 @@ mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodat
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
@@ -196,11 +199,11 @@ echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 
 # Adding keyfile to the initramfs to avoid double password.
-dd bs=512 count=4 if=/dev/random of=/mnt/.root.key iflag=fullblock &>/dev/null
-chmod 000 /mnt/.root.key &>/dev/null
-cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/.root.key
+dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
+chmod 000 /mnt/cryptkey/.root.key &>/dev/null
+cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key
 sed -i "s,quiet,cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf cryptkey=rootfs:/.root.key,g" /mnt/etc/default/grub
-sed -i 's#FILES=()#FILES=(/.root.key)#g' /mnt/etc/mkinitcpio.conf
+sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 # Security kernel settings.
 echo "kernel.kptr_restrict = 2" > /mnt/etc/sysctl.d/51-kptr-restrict.conf
