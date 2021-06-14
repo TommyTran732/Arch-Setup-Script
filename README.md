@@ -23,7 +23,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 6. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
 
 ### Changes to the original project
-1. Encrypted /boot (This was previously present on EasyArch, but Tommaso changed his script to use LUKS2 and have unencrypted /boot. Personally I would not do this, since encrypting /boot is the only way to protect the initramfs from being tampered with. GRUB will only validate the kernel if Secure Boot is used, not the initramfs).
+1. Encrypted /boot (This PR was previously accepted to EasyArch, but Tommaso reverted it back to unencrypted /boot. Personally I would not do this, since encrypting /boot is the only way to protect the initramfs from being tampered with. GRUB will only validate the kernel if Secure Boot is used, not the initramfs).
 2. SUSE - like partition layout
 3. Snapper snapshots & rollback
 4. Default umask to 077
