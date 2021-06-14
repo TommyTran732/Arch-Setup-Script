@@ -23,7 +23,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 6. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
 
 ### Changes to the original project
-1. Encrypted /boot (This PR was previously accepted to EasyArch, but Tommaso reverted it back to unencrypted /boot. Personally I would not do this, since encrypting /boot is the only way to protect the initramfs from being tampered with. GRUB will only validate the kernel if Secure Boot is used, not the initramfs).
+1. Encrypted /boot
 2. SUSE - like partition layout
 3. Snapper snapshots & rollback
 4. Default umask to 077
@@ -32,6 +32,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 7. Added more filesystem support (Since Disk Utility is a GNOME dependency and it supports exFAT, NTFS, F2FS and UDF, I added support for those out of the box to make the experience a bit better out of the box)
 8. Randomize Mac Address and disable Connectivity Check for privacy
 9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
+10. Kernel security settings
 
 ### Why so many @var_xxx subvolumes?
 Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
