@@ -77,7 +77,7 @@ mkfs.fat -F 32 $ESP &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
-cryptsetup --type luks1 luksFormat $cryptroot
+cryptsetup luksFormat $cryptroot
 echo "Opening the newly created LUKS Container."
 cryptsetup open $cryptroot cryptroot
 BTRFS="/dev/mapper/cryptroot"
@@ -267,7 +267,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm png jpeg part_msdos loadenv luks2" --disable-shim-lock &>/dev/null
     #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux
     #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen
     
