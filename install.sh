@@ -159,7 +159,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire pipewire-pulse pipewire-alsa pipewire-jack nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus flatpak xdg-user-dirs firewalld exfatprogs ntfs-3g f2fs-tools udftools adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector man-db
+pacstrap /mnt base base-devel ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire pipewire-pulse pipewire-alsa pipewire-jack nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus flatpak xdg-user-dirs firewalld exfatprogs ntfs-3g f2fs-tools udftools adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector man-db snap-pac
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -197,6 +197,9 @@ UUID=$(blkid $cryptroot | cut -f2 -d'"')
 sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
+sed -i 's# part_msdos##g' /mnt/default/grub
+sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /mnt/etc/grub.d/10_linux
+sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /mnt/etc/grub.d/20_linux_xen
 
 # Adding keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
@@ -267,14 +270,12 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm png jpeg part_msdos loadenv luks2" --disable-shim-lock &>/dev/null
-    #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux
-    #sed -i 's#"rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm png jpeg oadenv luks2 tpm" --disable-shim-lock &>/dev/null
     
     # Creating grub config file.
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
-    pacman -S --noconfirm snap-pac
+
 EOF
 
 # Setting root password.
