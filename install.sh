@@ -77,7 +77,7 @@ mkfs.fat -F 32 $ESP &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
-cryptsetup luksFormat $cryptroot
+cryptsetup luksFormat --type luks1 $cryptroot
 echo "Opening the newly created LUKS Container."
 cryptsetup open $cryptroot cryptroot
 BTRFS="/dev/mapper/cryptroot"
@@ -270,7 +270,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv cryptodisk luks2 tpm" --disable-shim-lock &>/dev/null
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile" --disable-shim-lock &>/dev/null
     
     # Creating grub config file.
     echo "Creating GRUB config file."
