@@ -103,8 +103,6 @@ btrfs subvolume create /mnt/@/var_crash &>/dev/null
 btrfs subvolume create /mnt/@/var_cache &>/dev/null
 btrfs subvolume create /mnt/@/var_tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_spool &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
 btrfs subvolume create /mnt/@/cryptkey &>/dev/null
 chattr +C /mnt/@/boot
@@ -148,8 +146,6 @@ mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodat
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_tmp $BTRFS /mnt/var/tmp
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 mkdir -p /mnt/boot/efi
