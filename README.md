@@ -18,9 +18,8 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 1. Snapper rollback <number> works! You will no longer need to manually rollback from a live USB like you would with the @ and @home layout suggested in the Arch Wiki.f2fs-tools udftools
 2. You can boot into a readonly snapshot! GDM and other services will start normally so you can get in and verify that everything works before rolling back.
 3. Automatic snapshots on pacman install/update operations
-4. /boot and /boot/efi are 2 seperate subvolumes which will not be rolled back with snapper.
-5. For consistency with pacman's database, I deviate from SUSE's partition layout leave /usr/local/ and /opt as part of the snapshot. When you rollback, everything in those 2 directories rollback as well.
-6. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
+4. Directories such as /boot, /boot/efi, /tmp, /var/log, /var/crash, /var/tmp, /var/spool, /var/lib/libvirt/images are excluded from the snapshots as they either should be persistent or are just temporary files. /cryptkey is excluded as we do not want the encryption key to be included in the snapshots, which could be sent to another device as a backup.
+5. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
 
 ### Changes to the original project
 1. Encrypted /boot
