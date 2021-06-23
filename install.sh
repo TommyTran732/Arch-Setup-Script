@@ -97,7 +97,6 @@ btrfs subvolume create /mnt/@/boot/ &>/dev/null
 btrfs subvolume create /mnt/@/home &>/dev/null
 btrfs subvolume create /mnt/@/root &>/dev/null
 btrfs subvolume create /mnt/@/srv &>/dev/null
-btrfs subvolume create /mnt/@/tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_log &>/dev/null
 btrfs subvolume create /mnt/@/var_crash &>/dev/null
 btrfs subvolume create /mnt/@/var_cache &>/dev/null
@@ -107,7 +106,6 @@ btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
 btrfs subvolume create /mnt/@/cryptkey &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
-chattr +C /mnt/@/tmp
 chattr +C /mnt/@/var_log
 chattr +C /mnt/@/var_crash
 chattr +C /mnt/@/var_cache
@@ -140,7 +138,6 @@ mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvo
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
-mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/tmp
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log $BTRFS /mnt/var/log
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_crash $BTRFS /mnt/var/crash
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_cache $BTRFS /mnt/var/cache
