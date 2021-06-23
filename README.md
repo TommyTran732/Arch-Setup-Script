@@ -34,15 +34,6 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
 10. Kernel security settings
 
-### Why so many @var_xxx subvolumes?
-Most of these subvolumes come from SUSE's partition layout prior to 2018, before they simply made @var its own subvolume. We cannot blindly do this however, since pacman 
-stores its database in /var/lib/pacman/local, which needs to be excluded and rolled back accordingly to the rest of the system.
-
-Other than that, /var/lib/gdm and /var/lib/AccountsService must have their own read-write subvolume in order to boot GNOME from a read only snapshot.
-
-### Why GNOME?
-I only use GNOME and I know that I have to explicitly create a seperate a subvolume for /var/lib/gdm, /var/cache, /var/tmp and so on for a full desktop to boot from a read-only snapshot. I don't know how other desktop environments behave and which directories we need to create a seperate subvolume for. We will also change the partitioning scheme according to the DE selection as well, since it doesn't make any sense to create @var_lib_gdm on a KDE system. Any help with adding more DE options would be appreciated.
-
 ### Partitions layout 
 
 | Partition/Subvolume | Label                        | Mountpoint               | Notes                       |
@@ -60,9 +51,7 @@ I only use GNOME and I know that I have to explicitly create a seperate a subvol
 | 11                  | @/var_cache                  | /var/cache               | Encrypted BTRFS (nodatacow) |
 | 12                  | @/var_tmp                    | /var/tmp                 | Encrypted BTRFS (nodatacow) |
 | 13                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
-| 14                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS             |
-| 15                  | @/var_lib_AccountService     | /var/lib/AccountsService | Encrypted BTRFS             |
-| 16                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
+| 14                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
 
 ### To do
 1. Automate wheel user setup
