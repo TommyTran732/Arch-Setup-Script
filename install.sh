@@ -259,7 +259,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkdir /.snapshots
     mount -a
     chmod 750 /.snapshots
-    systemctl enable grub-btrfs.path
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
@@ -276,27 +275,35 @@ echo "Setting root password."
 arch-chroot /mnt /bin/passwd
 
 # Enabling auto-trimming service.
-echo "Enabling auto-trimming."
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
 
 # Enabling NetworkManager service.
-echo "Enabling NetworkManager."
+echo "Enabling NetworkManager"
 systemctl enable NetworkManager --root=/mnt &>/dev/null
 
 # Enabling GDM.
 systemctl enable gdm --root=/mnt &>/dev/null
 
 # Enabling AppArmor.
+echo "Enabling AppArmor."
 systemctl enable apparmor --root=/mnt &>/dev/null
 
 # Enabling Firewalld.
+echo "Enabling Firewalld."
 systemctl enable firewalld --root=/mnt &>/dev/null
 
 # Enabling Bluetooth Service (If you don't want bluetooth, disable it with GNOME, don't disable the service).
 systemctl enable bluetooth --root=/mnt &>/dev/null
 
 # Enabling Reflector timer.
+echo "Enabling Reflector."
 systemctl enable reflector.timer --root=/mnt &>/dev/null
+
+# Enabling Snapper automatic snapshots.
+echo "Enabling Snapper and automatic snapshots entries."
+systemctl enable snapper-timeline.timer --root=/mnt &>/dev/null
+systemctl enable snapper-cleanup.timer --root=/mnt &>/dev/null
+systemctl enable grub-btrfs.path --root=/mnt &>/dev/null
 
 # Setting umask to 077.
 sed -i 's/022/077/g' /mnt/etc/profile
