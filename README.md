@@ -45,11 +45,13 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 6                   | @/.snapshots                 | /.snapshots              | Encrypted BTRFS             |
 | 7                   | @/srv                        | /srv                     | Encrypted BTRFS (nodatacow) |
 | 8                   | @/var_log                    | /var/log                 | Encrypted BTRFS (nodatacow) |
-| 9                  | @/var_crash                  | /var/crash               | Encrypted BTRFS (nodatacow) |
+| 9                   | @/var_crash                  | /var/crash               | Encrypted BTRFS (nodatacow) |
 | 10                  | @/var_cache                  | /var/cache               | Encrypted BTRFS (nodatacow) |
 | 11                  | @/var_tmp                    | /var/tmp                 | Encrypted BTRFS (nodatacow) |
 | 12                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
 | 13                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
+| 14                  | @/var_lib_machines           | /var/lib/machines        | Encrypted BTRFS (nodatacow) |
+| 15                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
 
 ### To do
 1. Automate wheel user setup
