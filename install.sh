@@ -155,7 +155,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire pipewire-pulse pipewire-alsa pipewire-jack nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac
+pacstrap /mnt base ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor pipewire-pulse pipewire-alsa pipewire-jack nano gnome-shell gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
