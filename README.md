@@ -28,10 +28,9 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 4. Default umask to 077
 5. Firewalld is enabled by default
 6. Minimally setup GNOME 40 with pipewire
-7. Added more filesystem support (Since Disk Utility is a GNOME dependency and it supports exFAT, NTFS, F2FS and UDF, I added support for those out of the box to make the experience a bit better out of the box)
-8. Randomize Mac Address and disable Connectivity Check for privacy
-9. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
-10. Kernel security settings
+7. Randomize Mac Address and disable Connectivity Check for privacy
+8. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
+9. Kernel security settings
 
 ### Partitions layout 
 
