@@ -50,7 +50,9 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 12                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
 | 13                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
 | 14                  | @/var_lib_machines           | /var/lib/machines        | Encrypted BTRFS (nodatacow) |
-| 15                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
+| 15                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS (nodatacow) |
+| 16                  | @/var_lib_AccountsService    | /var/lib/AccountsService | Encrypted BTRFS (nodatacow) |
+| 17                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
 
 ### To do
 1. Automate wheel user setup
