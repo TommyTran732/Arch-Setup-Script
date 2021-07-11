@@ -104,6 +104,8 @@ btrfs subvolume create /mnt/@/var_tmp &>/dev/null
 btrfs subvolume create /mnt/@/var_spool &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
 btrfs subvolume create /mnt/@/var_lib_machines &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
+btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs subvolume create /mnt/@/cryptkey &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
@@ -114,6 +116,8 @@ chattr +C /mnt/@/var_tmp
 chattr +C /mnt/@/var_spool
 chattr +C /mnt/@/var_lib_libvirt_images
 chattr +C /mnt/@/var_lib_machines
+chattr +C /mnt/@/var_lib_gdm
+chattr +C /mnt/@/var_lib_AccountsService
 chattr +C /mnt/@/cryptkey
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
@@ -134,7 +138,7 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{/boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/cryptkey}
+mkdir -p /mnt/{/boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/home $BTRFS /mnt/home
@@ -147,6 +151,8 @@ mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodat
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_spool $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_machines $BTRFS /mnt/var/lib/machines
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
@@ -186,7 +192,7 @@ EOF
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook."
 sed -i 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
-sed -i 's,modconf block filesystems keyboard,keyboard modconf block encrypt filesystems grub-btrfs-overlayfs,g' /mnt/etc/mkinitcpio.conf
+sed -i 's,modconf block filesystems keyboard,keyboard modconf block encrypt filesystems,g' /mnt/etc/mkinitcpio.conf
 
 # Enabling LUKS in GRUB and setting the UUID of the LUKS container.
 UUID=$(blkid $cryptroot | cut -f2 -d'"')
