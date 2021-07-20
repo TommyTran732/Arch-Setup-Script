@@ -161,7 +161,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac earlyoom
+pacstrap /mnt base ${kernel} ${kernel}-headers ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -308,9 +308,9 @@ systemctl enable bluetooth --root=/mnt &>/dev/null
 echo "Enabling Reflector."
 systemctl enable reflector.timer --root=/mnt &>/dev/null
 
-# Enabling EarlyOOM timer.
-echo "Enabling Reflector."
-systemctl enable earlyoom --root=/mnt &>/dev/null
+# Enabling systemd-oom.
+echo "Enabling systemd-oomd."
+systemctl enable systemd-oomd --root=/mnt &>/dev/null
 
 # Enabling Snapper automatic snapshots.
 echo "Enabling Snapper and automatic snapshots entries."
