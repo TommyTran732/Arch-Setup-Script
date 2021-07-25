@@ -58,7 +58,7 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 16                  | @/var_lib_AccountsService    | /var/lib/AccountsService | Encrypted BTRFS (nodatacow) |
 | 17                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
 
-### LUKS1 and Encrypted /boot (Mumbo Jumbo stuff for anyone who's wondering why)
+### LUKS1 and Encrypted /boot (Mumbo Jumbo stuff)
 This is the same setup that is used on openSUSE. One problem with the way Secure Boot currently works is that the initramfs and a variety of things in /boot are not validated by GRUB whatsoever, even if Secure Boot is active. Thus, they are vulnerable to tampering. My approach as of now is to encrypt the entire /boot partition and have the only that is unencrypted - the grubx64.efi stub - validated by the firmware. 
 
 Ideally, I could use GRUB's GPG verification for the initramfs and its configuration files and what not, but then I need to create hooks to sign them everytime they get updated (when a new initramfs gets generated, when grub-btrfs.path gets triggered, when grub gets updated and its config files change, etc). It is quite a tedious task and I have yet to implement or test this out.
