@@ -277,17 +277,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
+    #Creating wheel user
+    read -r -p "Please choose an admin user to create: " USER
+    echo "Creating user $USER"
+    useradd -m -g wheel $USER
+    passwd $USER
 EOF
 
-#Creating Wheel user
-read -r -p "Please choose an admin user to create: " USER
-
-# Create user
-echo "Creating user $USER"
-useradd -m -g wheel $USER
-passwd $USER
-
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
+#Giving wheel user sudo access
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
 
 # Enabling auto-trimming service.
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
