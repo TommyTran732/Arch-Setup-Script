@@ -20,6 +20,7 @@ This fork comes with various security improvements and fully working rollbacks w
 5. Defaulting umask to 077
 6. Randomize Mac Address and disable Connectivity Check for privacy
 7. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
+8. Added udev rules from https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/tree/master/etc/udev/rules.d
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
