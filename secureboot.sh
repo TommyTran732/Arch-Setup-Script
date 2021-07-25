@@ -30,7 +30,7 @@ cp /usr/share/libalpm/hooks/90-mkinitcpio-install.hook /etc/pacman.d/hooks/90-mk
 sed -i 's#Exec = /usr/share/libalpm/scripts/mkinitcpio-install#Exec = /usr/local/share/libalpm/scripts/mkinitcpio-install#g' /etc/pacman.d/hooks/90-mkinitcpio-install.hook
 
 cp /usr/share/libalpm/scripts/mkinitcpio-install /usr/local/share/libalpm/scripts/mkinitcpio-install
-sed -i 's#install -Dm644 "${line}" "/boot/vmlinuz-${pkgbase}"#sbsign --key /etc/efi-keys/DB.crt --cert /path/to/db.crt --output "/boot/vmlinuz-${pkgbase}" "${line}"#g' /usr/local/share/libalpm/scripts/mkinitcpio-install
+sed -i 's#install -Dm644 "${line}" "/boot/vmlinuz-${pkgbase}"#sbsign --key /etc/efi-keys/DB.key --cert /etc/efi-keys/DB.crt --output "/boot/vmlinuz-${pkgbase}" "${line}"#g' /usr/local/share/libalpm/scripts/mkinitcpio-install
 
 mkdir -p /etc/secureboot/keys/{db,dbx,KEK,PK}
 ln -s /etc/efi-keys/DB.auth /etc/secureboot/keys/db/DB.auth
