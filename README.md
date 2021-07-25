@@ -56,6 +56,5 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 ### To do
 1. Install yay and setup opensnitch
 2. Reduce the number of password prompts
-3. Automatic secure boot setup with your own keys (no, we are not using shim).
-4. Optional Nvidia driver installation 
-5. Automatic zram setup
+3. Optional Nvidia driver installation 
+4. Automatic zram setup
