@@ -279,9 +279,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
 EOF
 
-# Setting root password.
-echo "Setting root password."
-arch-chroot /mnt /bin/passwd
+#Creating Wheel user
+read -r -p "Please choose an admin user to create: " USER
+
+# Create user
+echo "Creating user $USER"
+useradd -m -g wheel $USER
+passwd $USER
+
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
 
 # Enabling auto-trimming service.
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
