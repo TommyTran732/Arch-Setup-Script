@@ -1,5 +1,5 @@
 ### Introduction
-This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process.
+This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process (UEFI only).
 
 This fork comes with various security improvements and fully working rollbacks with snapper. I do submit some of the changes here back to upstream as well.
 
@@ -26,6 +26,7 @@ Currently, there is an problem where GRUB requires tpm.mod to be included for si
 6. Randomize Mac Address and disable Connectivity Check for privacy
 7. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
 8. Added udev rules from https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/tree/master/etc/udev/rules.d
+9. Added Secure Boot script
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
