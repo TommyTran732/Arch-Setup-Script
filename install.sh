@@ -216,7 +216,7 @@ curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/g
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_distrust_cpu.cfg >> /mnt/etc/grub.d/40_distrust_cpu
 
 # Enabling IOMMU
-curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_enable_iommu.cfg >> 40_enable_iommu
+curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_enable_iommu.cfg >> /mnt/etc/grub.d/40_enable_iommu
 
 # Adding keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
@@ -224,6 +224,9 @@ chmod 000 /mnt/cryptkey/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key
 sed -i "s#quiet#cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=lockdown,yama,apparmor,bpf cryptkey=rootfs:/cryptkey/.root.key#g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
+
+# Blacklisting kernel modules
+curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/modprobe.d/30_security-misc.conf >> /mnt/etc/modprobe.d/30_security-misc.conf
 
 # Security kernel settings.
 echo "kernel.kptr_restrict = 2" > /mnt/etc/sysctl.d/51-kptr-restrict.conf
@@ -320,7 +323,8 @@ systemctl enable apparmor --root=/mnt &>/dev/null
 echo "Enabling Firewalld."
 systemctl enable firewalld --root=/mnt &>/dev/null
 
-# Enabling Bluetooth Service (If you don't want bluetooth, disable it with GNOME, don't disable the service).
+# Enabling Bluetooth Service (This is only to fix the visual glitch with gnome where it gets stuck in the menu at the top right).
+# IF YOU WANT TO USE BLUETOOTH, YOU MUST REMOVE IT FROM THE LIST OF BLACKLISTED KERNEL MODULES IN /mnt/etc/modprobe.d/30_security-misc.conf
 systemctl enable bluetooth --root=/mnt &>/dev/null
 
 # Enabling Reflector timer.
@@ -341,9 +345,6 @@ systemctl enable grub-btrfs.path --root=/mnt &>/dev/null
 sed -i 's/022/077/g' /mnt/etc/profile
 echo "" >> /mnt/etc/bash.bashrc
 echo "umask 077" >> /mnt/etc/bash.bashrc
-
-#Blacklist Firewire SBP2.
-echo "blacklist firewire-sbp2" | sudo tee /mnt/etc/modprobe.d/blacklist.conf
 
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
 exit
