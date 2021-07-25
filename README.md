@@ -12,6 +12,15 @@ This fork comes with various security improvements and fully working rollbacks w
 6. `cd Arch-Setup-Script`
 7. `chmod u+x ./install.sh && ./install.sh`
 
+### Changes to the original project
+1. Encrypted /boot with LUKS1
+2. SUSE - like partition layout and fully working snapper snapshots & rollback
+3. Minimally setup GNOME 40 with pipewire
+4. AppArmor and Firewalld enabled by default
+5. Defaulting umask to 077
+6. Randomize Mac Address and disable Connectivity Check for privacy
+7. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
+
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
 1. Snapper rollback <number> works! You will no longer need to manually rollback from a live USB like you would with the @ and @home layout suggested in the Arch Wiki.
@@ -19,17 +28,6 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 3. Automatic snapshots on pacman install/update operations
 4. Directories such as /boot, /boot/efi, /var/log, /var/crash, /var/tmp, /var/spool, /var/lib/libvirt/images are excluded from the snapshots as they either should be persistent or are just temporary files. /cryptkey is excluded as we do not want the encryption key to be included in the snapshots, which could be sent to another device as a backup.
 5. GRUB will boot into the default BTRFS snapshot set by snapper. Like on SUSE, your running system will always be a read-write snapshot in @/.snapshots/X/snapshot. 
-
-### Changes to the original project
-1. Encrypted /boot
-2. SUSE - like partition layout
-3. Snapper snapshots & rollback
-4. Default umask to 077
-5. Firewalld is enabled by default
-6. Minimally setup GNOME 40 with pipewire
-7. Randomize Mac Address and disable Connectivity Check for privacy
-8. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
-
 
 ### Partitions layout 
 
