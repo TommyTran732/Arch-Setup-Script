@@ -15,7 +15,7 @@ This fork comes with various security improvements and fully working rollbacks w
 ### SecureBoot
 The Secure Boot script can be run post installation to automate the process of generating your own keys and setting up Secure Boot described at https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot. Please make sure that your firmware is in Setup mode and the TPM is disabled.
 
-Currently, there is an problem where GRUB requires tpm.mod to be included for signature verification, but if tpm.mod is included and the TPM is enabled it will also attempt to do Measured Boot, breaking the Arch Linux snapshots created by grub-btrfs. I have yet to find a solution for this issue.
+Currently, there is an problem where GRUB requires tpm.mod to be included for signature verification, but if tpm.mod is included and the TPM is enabled it will also attempt to do Measured Boot, breaking the Arch Linux snapshots menu created by grub-btrfs. I have yet to find a solution for this issue.
 
 ### Changes to the original project
 1. Encrypted /boot with LUKS1
