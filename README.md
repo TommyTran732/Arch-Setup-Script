@@ -52,9 +52,3 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 15                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS (nodatacow) |
 | 16                  | @/var_lib_AccountsService    | /var/lib/AccountsService | Encrypted BTRFS (nodatacow) |
 | 17                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
-
-### To do
-1. Install yay and setup opensnitch
-2. Reduce the number of password prompts
-3. Optional Nvidia driver installation 
-4. Automatic zram setup
