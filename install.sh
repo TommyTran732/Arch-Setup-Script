@@ -341,7 +341,7 @@ echo "" >> /mnt/etc/bash.bashrc
 echo "umask 077" >> /mnt/etc/bash.bashrc
 
 # Setting up ZRAM
-MEM = $(awk '/^Mem/ {print $2}' <(free -m))
+MEM=$(awk '/^Mem/ {print $2}' <(free -m))
 if [ "${MEM}" -ge "8192" ]; then
     ZRAMSIZE = 8192
 else 
@@ -354,5 +354,6 @@ echo 'KERNEL=="zram0", ATTR{disksize}="${ZRAMSIZE}M" RUN="/usr/bin/mkswap /dev/z
 echo '# ZRAM' >> /mnt/etc/fstab
 echo '/dev/zram0 					none 		swap 		defaults 0 0' >> /mnt/etc/fstab
 
+# Finishing up
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
 exit
