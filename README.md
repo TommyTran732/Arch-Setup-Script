@@ -54,9 +54,8 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 17                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
 
 ### To do
-1. Automate wheel user setup
-2. Install yay and setup opensnitch
-3. Reduce the number of password prompts
-4. Automatic secure boot setup with your own keys (no, we are not using shim).
-5. Optional Nvidia driver installation 
-6. Automatic zram setup
+1. Install yay and setup opensnitch
+2. Reduce the number of password prompts
+3. Automatic secure boot setup with your own keys (no, we are not using shim).
+4. Optional Nvidia driver installation 
+5. Automatic zram setup
