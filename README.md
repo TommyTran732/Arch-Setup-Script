@@ -11,7 +11,6 @@ This fork comes with various security improvements and fully working rollbacks w
 5. `git clone https://github.com/tommytran732/Arch-Setup-Script/`
 6. `cd Arch-Setup-Script`
 7. `chmod u+x ./install.sh && ./install.sh`
-8. do `arch-chroot /mnt` and create your wheel user once the script is done. Remember to give the wheel group priviledges in `visudo`.
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
