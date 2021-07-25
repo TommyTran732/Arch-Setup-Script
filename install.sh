@@ -219,6 +219,9 @@ curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/g
 # Enabling IOMMU
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_enable_iommu.cfg >> /mnt/etc/grub.d/40_enable_iommu
 
+# Setting GRUB configuration file permissions
+chmod 755 /mnt/etc/grub.d/*
+
 # Adding keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/cryptkey/.root.key &>/dev/null
@@ -228,15 +231,18 @@ sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 # Blacklisting kernel modules
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/modprobe.d/30_security-misc.conf >> /mnt/etc/modprobe.d/30_security-misc.conf
+chmod 600 /mnt/etc/modprobe.d/*
 
 # Security kernel settings.
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/sysctl.d/30_security-misc.conf >> /mnt/etc/sysctl.d/30_security-misc.conf
 sed -i 's/kernel.yama.ptrace_scope=2/kernel.yama.ptrace_scope=3/g' /mnt/etc/sysctl.d/30_security-misc.conf
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/sysctl.d/30_silent-kernel-printk.conf >> /mnt/etc/sysctl.d/30_silent-kernel-printk.conf
+chmod 600 /mnt/etc/sysctl.d/*
 
 # IO udev rules
 curl https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/raw/master/etc/udev/rules.d/50-sata.rules > /mnt/etc/udev/rules.d/50-sata.rules
 curl https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/raw/master/etc/udev/rules.d/60-ioschedulers.rules > /etc/udev/rules.d/60-ioschedulers.rules
+chmod 600 /mnt/etc/udev/rules.d/*
 
 # Randomize Mac Address.
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf' <<-'EOF'
@@ -355,6 +361,7 @@ fi
 
 echo 'zram' > /mnt/etc/modules-load.d/zram.conf
 echo 'options zram num_devices=1' > /mnt/etc/modprobe.d/zram.conf
+chmod 600 /mnt/etc/modprobe.d/*
 echo 'KERNEL=="zram0", ATTR{disksize}="'"${ZRAMSIZE}"'M" RUN="/usr/bin/mkswap /dev/zram0", TAG+="systemd"' > /mnt/etc/udev/rules.d/99-zram.rules
 echo '# ZRAM' >> /mnt/etc/fstab
 echo '/dev/zram0 					none 		swap 		defaults 0 0' >> /mnt/etc/fstab
