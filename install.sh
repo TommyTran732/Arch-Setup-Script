@@ -343,9 +343,9 @@ echo "umask 077" >> /mnt/etc/bash.bashrc
 # Setting up ZRAM
 MEM=$(awk '/^Mem/ {print $2}' <(free -m))
 if [ "${MEM}" -ge "8192" ]; then
-    ZRAMSIZE = 8192
+    ZRAMSIZE=8192
 else 
-    ZRAMSIZE = ${MEM}
+    ZRAMSIZE=${MEM}
 fi 
 
 echo 'zram' > /mnt/etc/modules-load.d/zram.conf
