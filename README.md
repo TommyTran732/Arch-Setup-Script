@@ -29,7 +29,8 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 6. Minimally setup GNOME 40 with pipewire
 7. Randomize Mac Address and disable Connectivity Check for privacy
 8. Blacklisted Firewire SBP2 (As recommended by https://www.ncsc.gov.uk/collection/end-user-device-security/platform-specific-guidance/ubuntu-18-04-lts)
-9. Kernel security settings
+9. Add some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
+
 
 ### Partitions layout 
 
