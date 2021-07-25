@@ -3,6 +3,12 @@
 # Cleaning the TTY.
 clear
 
+# Updating the live environment
+pacman -Syu
+
+# Installing curl
+pacman -S --noconfirm curl
+
 # Selecting the kernel flavor to install. 
 kernel_selector () {
     echo "List of kernels:"
@@ -202,6 +208,15 @@ echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETE
 sed -i 's# part_msdos##g' /mnt/etc/default/grub
 sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
 sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/20_linux_xen
+
+# Enabling CPU Mitigations
+curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_cpu_mitigations.cfg >> /mnt/etc/grub.d/40_cpu_mitigations
+
+# Distrusting the CPU
+curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_distrust_cpu.cfg >> /mnt/etc/grub.d/40_distrust_cpu
+
+# Enabling IOMMU
+curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_enable_iommu.cfg >> 40_enable_iommu
 
 # Adding keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
