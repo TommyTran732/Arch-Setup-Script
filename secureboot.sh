@@ -45,3 +45,18 @@ chmod -R g-rwx /etc/secureboot
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile tpm gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock
 sbsign --key /etc/efi-keys/DB.key --cert /etc/efi-keys/DB.crt --output /boot/efi/EFI/GRUB/grubx64.efi /boot/efi/EFI/GRUB/grubx64.efi 
 grub-mkconfig -o /boot/grub/grub.cfg
+
+cat << EOF >> /etc/pacman.d/hooks/grub.hook
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Type=Package
+Target=grub
+
+[Action]
+Description=Update grubx64.efi
+Depends=grub
+When=PostTransaction
+NeedsTargets
+Exec=/bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile tpm gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock && /usr/bin/sbsign --key /etc/efi-keys/DB.key --cert /etc/efi-keys/DB.crt --output /boot/efi/EFI/GRUB/grubx64.efi /boot/efi/EFI/GRUB/grubx64.efi && /usr/bin/sed -i 's#rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/10_linux && /usr/bin/sed -i 's#rootflags=subvol=${rootsubvol} ##g' /etc/grub.d/20_linux_xen && /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg'
+EOF
