@@ -325,7 +325,7 @@ systemctl enable bluetooth --root=/mnt &>/dev/null
 echo "Enabling Reflector."
 systemctl enable reflector.timer --root=/mnt &>/dev/null
 
-# Enabling systemd-oom.
+# Enabling systemd-oomd.
 echo "Enabling systemd-oomd."
 systemctl enable systemd-oomd --root=/mnt &>/dev/null
 
