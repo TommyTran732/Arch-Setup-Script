@@ -95,24 +95,25 @@ mount $BTRFS /mnt
 
 # Creating BTRFS subvolumes.
 echo "Creating BTRFS subvolumes."
-btrfs subvolume create /mnt/@ &>/dev/null
-btrfs subvolume create /mnt/@/.snapshots &>/dev/null
+btrfs su cr /mnt/@ &>/dev/null
+btrfs su cr /mnt/@/.snapshots &>/dev/null
 mkdir -p /mnt/@/.snapshots/1 &>/dev/null
-btrfs subvolume create /mnt/@/.snapshots/1/snapshot &>/dev/null
-btrfs subvolume create /mnt/@/boot/ &>/dev/null
-btrfs subvolume create /mnt/@/home &>/dev/null
-btrfs subvolume create /mnt/@/root &>/dev/null
-btrfs subvolume create /mnt/@/srv &>/dev/null
-btrfs subvolume create /mnt/@/var_log &>/dev/null
-btrfs subvolume create /mnt/@/var_crash &>/dev/null
-btrfs subvolume create /mnt/@/var_cache &>/dev/null
-btrfs subvolume create /mnt/@/var_tmp &>/dev/null
-btrfs subvolume create /mnt/@/var_spool &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_libvirt_images &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_machines &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_gdm &>/dev/null
-btrfs subvolume create /mnt/@/var_lib_AccountsService &>/dev/null
-btrfs subvolume create /mnt/@/cryptkey &>/dev/null
+btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
+btrfs su cr /mnt/@/boot/ &>/dev/null
+btrfs su cr /mnt/@/home &>/dev/null
+btrfs su cr /mnt/@/root &>/dev/null
+btrfs su cr /mnt/@/srv &>/dev/null
+btrfs su cr /mnt/@/var_log &>/dev/null
+btrfs su cr /mnt/@/var_crash &>/dev/null
+btrfs su cr /mnt/@/var_cache &>/dev/null
+btrfs su cr /mnt/@/var_tmp &>/dev/null
+btrfs su cr /mnt/@/var_spool &>/dev/null
+btrfs su cr /mnt/@/var_lib_libvirt_images &>/dev/null
+btrfs su cr /mnt/@/var_lib_machines &>/dev/null
+btrfs su cr /mnt/@/var_lib_gdm &>/dev/null
+btrfs su cr /mnt/@/var_lib_AccountsService &>/dev/null
+btrfs su cr /mnt/@/cryptkey &>/dev/null
+
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var_log
@@ -125,6 +126,7 @@ chattr +C /mnt/@/var_lib_machines
 chattr +C /mnt/@/var_lib_gdm
 chattr +C /mnt/@/var_lib_AccountsService
 chattr +C /mnt/@/cryptkey
+
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
 cat << EOF >> /mnt/@/.snapshots/1/info.xml
