@@ -2,7 +2,7 @@
 
 pacman -S --noconfirm sbsigntools efitools openssl
 mkdir -p /etc/efi-keys
-cd /etc/efi-keys
+cd /etc/efi-keys || exit
 curl -L -O https://www.rodsbooks.com/efi-bootloaders/mkkeys.sh
 chmod +x mkkeys.sh
 ./mkkeys.sh
