@@ -34,8 +34,7 @@ kernel_selector () {
 
 # Checking the microcode to install.
 CPU=$(grep vendor_id /proc/cpuinfo)
-if [[ $CPU == *"AuthenticAMD"* ]]
-then
+if [[ $CPU == *"AuthenticAMD"* ]]; then
     microcode=amd-ucode
 else
     microcode=intel-ucode
@@ -53,8 +52,7 @@ done
 # Deleting old partition scheme.
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
-if [[ "$response" =~ ^(yes|y)$ ]]
-then
+if [[ "$response" =~ ^(yes|y)$ ]]; then
     wipefs -af "$DISK" &>/dev/null
     sgdisk -Zo "$DISK" &>/dev/null
 else
@@ -172,7 +170,7 @@ kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac mlocate man-db
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
