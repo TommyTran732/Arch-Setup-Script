@@ -155,7 +155,7 @@ mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvo
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $BTRFS /mnt/var/log/journal
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $BTRFS /mnt/var/crash
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $BTRFS /mnt/var/cache
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,subvol=@/var_cache $BTRFS /mnt/var/cache
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_tmp $BTRFS /mnt/var/tmp
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
