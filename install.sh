@@ -127,6 +127,7 @@ chattr +C /mnt/@/var_lib_gdm
 chattr +C /mnt/@/var_lib_AccountsService
 chattr +C /mnt/@/cryptkey
 
+#Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
 cat << EOF >> /mnt/@/.snapshots/1/info.xml
