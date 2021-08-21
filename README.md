@@ -48,15 +48,16 @@ The partition layout I use rallows us to replicate the behavior found in openSUS
 | 6                   | @/.snapshots                 | /.snapshots              | Encrypted BTRFS             |
 | 7                   | @/srv                        | /srv                     | Encrypted BTRFS (nodatacow) |
 | 8                   | @/var_log                    | /var/log                 | Encrypted BTRFS (nodatacow) |
-| 9                   | @/var_crash                  | /var/crash               | Encrypted BTRFS (nodatacow) |
-| 10                  | @/var_cache                  | /var/cache               | Encrypted BTRFS (nodatacow) |
-| 11                  | @/var_tmp                    | /var/tmp                 | Encrypted BTRFS (nodatacow) |
-| 12                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
-| 13                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
-| 14                  | @/var_lib_machines           | /var/lib/machines        | Encrypted BTRFS (nodatacow) |
-| 15                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS (nodatacow) |
-| 16                  | @/var_lib_AccountsService    | /var/lib/AccountsService | Encrypted BTRFS (nodatacow) |
-| 17                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
+| 9                   | @/var_log/journal            | /var/log/journal         | Encrypted BTRFS (nodatacow) |
+| 10                  | @/var_crash                  | /var/crash               | Encrypted BTRFS (nodatacow) |
+| 11                  | @/var_cache                  | /var/cache               | Encrypted BTRFS (nodatacow) |
+| 12                  | @/var_tmp                    | /var/tmp                 | Encrypted BTRFS (nodatacow) |
+| 13                  | @/var_spool                  | /var/spool               | Encrypted BTRFS (nodatacow) |
+| 14                  | @/var_lib_libvirt_images     | /var/lib/libvirt/images  | Encrypted BTRFS (nodatacow) |
+| 15                  | @/var_lib_machines           | /var/lib/machines        | Encrypted BTRFS (nodatacow) |
+| 16                  | @/var_lib_gdm                | /var/lib/gdm             | Encrypted BTRFS (nodatacow) |
+| 17                  | @/var_lib_AccountsService    | /var/lib/AccountsService | Encrypted BTRFS (nodatacow) |
+| 18                  | @/cryptkey                   | /cryptkey                | Encrypted BTRFS (nodatacow) |
 
 ### LUKS1 and Encrypted /boot (Mumbo Jumbo stuff)
 This is the same setup that is used on openSUSE. One problem with the way Secure Boot currently works is that the initramfs and a variety of things in /boot are not validated by GRUB whatsoever, even if Secure Boot is active. Thus, they are vulnerable to tampering. My approach as of now is to encrypt the entire /boot partition and have the only that is unencrypted - the grubx64.efi stub - validated by the firmware. 
