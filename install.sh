@@ -309,7 +309,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     passwd $USER
 EOF
 
-#Giving wheel user sudo access
+#Giving wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
 
 # Enabling auto-trimming service.
