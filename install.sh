@@ -154,24 +154,40 @@ mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,nodev
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
+
+# Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec. Thus I am splitting the subvolume.
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $BTRFS /mnt/var/log/journal
+
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $BTRFS /mnt/var/crash
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $BTRFS /mnt/var/cache
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_tmp $BTRFS /mnt/var/tmp
+
+# Pamac needs /var/tmp to have exec. Thus I am not adding that flag.
+# I am considering including pacmac-flatpak-gnome AUR package by default, since I am its maintainer.
+mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $BTRFS /mnt/var/tmp
+
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool $BTRFS /mnt/var/spool
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines $BTRFS /mnt/var/lib/machines
+
+# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them.
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
+
+# The encryption is splitted as we do not want to include it in the backup with snap-pac.
 mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $BTRFS /mnt/cryptkey
+
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
 
 kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
+# As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware fwupd grub grub-btrfs snapper efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts reflector snap-pac mlocate man-db
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac snap-sync efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
+
+# Routing jack2 through PipeWire.
+echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
