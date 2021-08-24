@@ -35,7 +35,7 @@ sed -i 's#install -Dm644 "${line}" "/boot/vmlinuz-${pkgbase}"#sbsign --key /etc/
 mkdir -p /etc/secureboot/keys/{db,dbx,KEK,PK}
 ln -s /etc/efi-keys/DB.auth /etc/secureboot/keys/db/DB.auth
 ln -s /etc/efi-keys/KEK.auth /etc/secureboot/keys/KEK/KEK.auth
-ln -s /etc/efi-keys/PK.auth /etc/secureboot/keys/KEK/PK.auth
+ln -s /etc/efi-keys/PK.auth /etc/secureboot/keys/PK/PK.auth
 
 sbkeysync --verbose --pk
 
