@@ -184,7 +184,7 @@ kernel_selector
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac snap-sync efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac snap-sync efibootmgr sudo networkmanager apparmor nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
@@ -368,21 +368,6 @@ systemctl enable grub-btrfs.path --root=/mnt &>/dev/null
 sed -i 's/022/077/g' /mnt/etc/profile
 echo "" >> /mnt/etc/bash.bashrc
 echo "umask 077" >> /mnt/etc/bash.bashrc
-
-# Setting up ZRAM
-MEMSIZE=$(awk '/^Mem/ {print $2}' <(free -m))
-if [ "${MEMSIZE}" -ge "8192" ]; then
-    ZRAMSIZE=8192
-else 
-    ZRAMSIZE=${MEMSIZE}
-fi 
-
-echo 'zram' > /mnt/etc/modules-load.d/zram.conf
-echo 'options zram num_devices=1' > /mnt/etc/modprobe.d/zram.conf
-chmod 600 /mnt/etc/modprobe.d/*
-echo 'KERNEL=="zram0", ATTR{disksize}="'"${ZRAMSIZE}"'M" RUN="/usr/bin/mkswap /dev/zram0", TAG+="systemd"' > /mnt/etc/udev/rules.d/99-zram.rules
-echo '# ZRAM' >> /mnt/etc/fstab
-echo '/dev/zram0 					none 		swap 		defaults 0 0' >> /mnt/etc/fstab
 
 # Finishing up
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
