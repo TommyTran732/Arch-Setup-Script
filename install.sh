@@ -262,6 +262,16 @@ curl https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-
 curl https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/raw/master/etc/udev/rules.d/60-ioschedulers.rules > /etc/udev/rules.d/60-ioschedulers.rules
 chmod 600 /mnt/etc/udev/rules.d/*
 
+# Remove nullok from system-auth
+sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
+
+# ZRAM configuration
+bash -c 'cat > /mnt/etc/systemd/zram-generator.conf' <<-'EOF'
+[zram0]
+zram-fraction = 1
+max-zram-size = 8192
+EOF
+
 # Randomize Mac Address.
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf' <<-'EOF'
 [device]
