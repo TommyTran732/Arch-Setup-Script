@@ -184,7 +184,7 @@ kernel_selector
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac snap-sync efibootmgr sudo networkmanager apparmor python2-notify nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac snap-sync efibootmgr sudo networkmanager apparmor python2-notify python-psutil nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
@@ -246,6 +246,10 @@ chmod 000 /mnt/cryptkey/.root.key &>/dev/null
 cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key
 sed -i "s#quiet#cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=landlock,lockdown,yama,apparmor,bpf cryptkey=rootfs:/cryptkey/.root.key#g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
+
+# Configure AppArmor Parser caching
+sed -i 's/#write-cache/write-cache/g' /etc/apparmor/parser.conf
+sed -i 's,#Include /etc/apparmor.d/,Include /etc/apparmor.d/#g' /etc/apparmor/parser.conf
 
 # Blacklisting kernel modules
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/modprobe.d/30_security-misc.conf >> /mnt/etc/modprobe.d/30_security-misc.conf
@@ -332,11 +336,31 @@ arch-chroot /mnt /bin/bash -e <<EOF
     read -r -p "Please choose an admin user to create: " USER
     echo "Creating user $USER"
     useradd -m -g wheel $USER
-    passwd $USER
+    passwd ${USER}
+    groupadd -r audit
+    gpasswd -a ${USER} audit
 EOF
 
-#Giving wheel user sudo access.
+# Enanble AppArmor notifications
+bash -c 'cat > /home/${USER}/.config/autostart/apparmor-notify.desktop' <<-'EOF'
+[Desktop Entry]
+Type=Application
+Name=AppArmor Notify
+Comment=Receive on screen notifications of AppArmor denials
+TryExec=aa-notify
+Exec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log
+StartupNotify=false
+NoDisplay=true
+EOF
+
+# Giving wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+
+# Change audit logging group
+echo "log_group = audit" >> /etc/audit/auditd.conf
+
+# Enabling audit service.
+systemctl enable auditd --root=/mnt &>/dev/null
 
 # Enabling auto-trimming service.
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
