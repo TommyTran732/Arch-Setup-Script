@@ -342,7 +342,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 EOF
 
 # Enanble AppArmor notifications
-bash -c 'cat > /home/${USER}/.config/autostart/apparmor-notify.desktop' <<-'EOF'
+bash -c 'cat > /mnt/home/${USER}/.config/autostart/apparmor-notify.desktop' <<-'EOF'
 [Desktop Entry]
 Type=Application
 Name=AppArmor Notify
