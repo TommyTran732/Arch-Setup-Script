@@ -3,6 +3,8 @@ This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a *
 
 This fork comes with various security improvements and fully working rollbacks with snapper. I do submit some of the changes here back to upstream as well.
 
+Visit my Matrix group: https://matrix.to/#/#tommytran732:matrix.org
+
 ### How does it work?
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
