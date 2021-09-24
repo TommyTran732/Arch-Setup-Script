@@ -306,7 +306,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Setting up clock.
     hwclock --systohc
     
-    # Generating locales.
+    # Generating locales.my keys aren't even on 
     echo "Generating locales."
     locale-gen &>/dev/null
     
@@ -365,8 +365,7 @@ systemctl enable auditd --root=/mnt &>/dev/null
 # Enabling auto-trimming service.
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
 
-# Enabling NetworkManager service.
-echo "Enabling NetworkManager"
+# Enabling NetworkManager.
 systemctl enable NetworkManager --root=/mnt &>/dev/null
 
 # Enabling GDM.
