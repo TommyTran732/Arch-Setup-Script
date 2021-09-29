@@ -269,6 +269,22 @@ chmod 600 /mnt/etc/udev/rules.d/*
 # Remove nullok from system-auth
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 
+# Disable coredump
+echo "* hard core 0" >> /mnt/etc/security/limits.conf
+
+# Disable su for non-wheel users
+bash -c 'cat > /mnt/etc/pam.d/su' <<-'EOF'
+#%PAM-1.0
+auth		sufficient	pam_rootok.so
+# Uncomment the following line to implicitly trust users in the "wheel" group.
+#auth		sufficient	pam_wheel.so trust use_uid
+# Uncomment the following line to require a user to be in the "wheel" group.
+auth		required	pam_wheel.so use_uid
+auth		required	pam_unix.so
+account		required	pam_unix.so
+session		required	pam_unix.so
+EOF
+
 # ZRAM configuration
 bash -c 'cat > /mnt/etc/systemd/zram-generator.conf' <<-'EOF'
 [zram0]
@@ -296,6 +312,14 @@ interval=0
 EOF
 
 chmod 600 /mnt/etc/NetworkManager/conf.d/20-connectivity.conf
+
+# Enable IPv6 privacy extensions
+bash -c 'cat > /mnt/etc/NetworkManager/conf.d/ip6-privacy.conf' <<-'EOF'
+[connection]
+ipv6.ip6-privacy=2
+EOF
+
+chmod 600 /mnt/etc/NetworkManager/conf.d/ip6-privacy.conf
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
