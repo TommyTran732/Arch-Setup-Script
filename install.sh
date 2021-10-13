@@ -148,33 +148,33 @@ umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
 mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/log/journal,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
-mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
+mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
 
 # Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec. Thus I am splitting the subvolume.
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $BTRFS /mnt/var/log/journal
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $BTRFS /mnt/var/log/journal
 
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $BTRFS /mnt/var/crash
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $BTRFS /mnt/var/cache
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $BTRFS /mnt/var/crash
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache $BTRFS /mnt/var/cache
 
 # Pamac needs /var/tmp to have exec. Thus I am not adding that flag.
 # I am considering including pacmac-flatpak-gnome AUR package by default, since I am its maintainer.
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $BTRFS /mnt/var/tmp
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,subvol=@/var_tmp $BTRFS /mnt/var/tmp
 
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool $BTRFS /mnt/var/spool
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines $BTRFS /mnt/var/lib/machines
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool $BTRFS /mnt/var/spool
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images $BTRFS /mnt/var/lib/libvirt/images
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines $BTRFS /mnt/var/lib/machines
 
 # GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them.
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
 
 # The encryption is splitted as we do not want to include it in the backup with snap-pac.
-mount -o ssd,noatime,space_cache,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $BTRFS /mnt/cryptkey
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
@@ -198,6 +198,17 @@ sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/sn
 read -r -p "Please enter the hostname: " hostname
 echo "$hostname" > /mnt/etc/hostname
 
+# Setting hosts file.
+echo "Setting hosts file."
+cat > /mnt/etc/hosts <<EOF
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain   $hostname
+EOF
+
+# Setting username.
+read -r -p "Please enter name for a user account (enter empty to not create one): " username
+
 # Setting up locales.
 read -r -p "Please insert the locale you use in this format (xx_XX): " locale
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
@@ -206,14 +217,6 @@ echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 # Setting up keyboard layout.
 read -r -p "Please insert the keyboard layout you use: " kblayout
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
-
-# Setting hosts file.
-echo "Setting hosts file."
-cat > /mnt/etc/hosts <<EOF
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   $hostname.localdomain   $hostname
-EOF
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook."
@@ -356,13 +359,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
-    #Creating wheel user
-    read -r -p "Please choose an admin user to create: " USER
-    echo "Creating user $USER"
-    useradd -m -g wheel $USER
-    passwd ${USER}
-    groupadd -r audit
-    gpasswd -a ${USER} audit
+    # Adding user with sudo privilege
+    if [ -n "$username" ]; then
+        echo "Adding $username with root privilege."
+        useradd -m $username
+        usermod -aG wheel $username
+        passwd ${USER}
+        groupadd -r audit
+        gpasswd -a ${USER} audit
+    fi
 EOF
 
 # Enanble AppArmor notifications
@@ -376,6 +381,11 @@ Exec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log
 StartupNotify=false
 NoDisplay=true
 EOF
+
+# Setting root password.
+echo "Setting root password."
+arch-chroot /mnt /bin/passwd
+[ -n "$username" ] && echo "Setting user password for ${username}." && arch-chroot /mnt /bin/passwd "$username"
 
 # Giving wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
