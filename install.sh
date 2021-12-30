@@ -3,13 +3,13 @@
 # Cleaning the TTY.
 clear
 
-# Updating the live environment
-pacman -Syu
+# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
+pacman -Sy
 
 # Installing curl
 pacman -S --noconfirm curl
 
-# Selecting the kernel flavor to install. 
+# Selecting the kernel flavor to install.
 kernel_selector () {
     echo "List of kernels:"
     echo "1) Stable — Vanilla Linux kernel and modules, with a few patches applied."
@@ -89,7 +89,7 @@ BTRFS="/dev/mapper/cryptroot"
 # Formatting the LUKS Container as BTRFS.
 echo "Formatting the LUKS container as BTRFS."
 mkfs.btrfs $BTRFS &>/dev/null
-mount $BTRFS /mnt
+mount -o clear_cache,nospace_cache $BTRFS /mnt
 
 # Creating BTRFS subvolumes.
 echo "Creating BTRFS subvolumes."
@@ -147,15 +147,16 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:15 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/log/journal,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
+mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root
 mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
 
-# Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec. Thus I am splitting the subvolume.
+# Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
+mkdir -p /mnt/var/log/journal
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,subvol=@/var_log_journal $BTRFS /mnt/var/log/journal
 
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash $BTRFS /mnt/var/crash
@@ -184,7 +185,7 @@ kernel_selector
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python2-notify python-psutil nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python-psutil nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
@@ -207,7 +208,7 @@ cat > /mnt/etc/hosts <<EOF
 EOF
 
 # Setting username.
-read -r -p "Please enter name for a user account (enter empty to not create one): " username
+read -r -p "Please enter name for a user account (leave empty to skip): " username
 
 # Setting up locales.
 read -r -p "Please insert the locale you use in this format (xx_XX): " locale
@@ -251,8 +252,8 @@ sed -i "s#quiet#cryptdevice=UUID=$UUID:cryptroot root=$BTRFS lsm=landlock,lockdo
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 # Configure AppArmor Parser caching
-sed -i 's/#write-cache/write-cache/g' /etc/apparmor/parser.conf
-sed -i 's,#Include /etc/apparmor.d/,Include /etc/apparmor.d/#g' /etc/apparmor/parser.conf
+sed -i 's/#write-cache/write-cache/g' /mnt/etc/apparmor/parser.conf
+sed -i 's,#Include /etc/apparmor.d/,Include /etc/apparmor.d/,g' /mnt/etc/apparmor/parser.conf
 
 # Blacklisting kernel modules
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/modprobe.d/30_security-misc.conf >> /mnt/etc/modprobe.d/30_security-misc.conf
@@ -324,19 +325,19 @@ EOF
 
 chmod 600 /mnt/etc/NetworkManager/conf.d/ip6-privacy.conf
 
-# Configuring the system.    
+# Configuring the system.
 arch-chroot /mnt /bin/bash -e <<EOF
-    
+
     # Setting up timezone.
     ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
-    
+
     # Setting up clock.
     hwclock --systohc
-    
-    # Generating locales.my keys aren't even on 
+
+    # Generating locales.my keys aren't even on
     echo "Generating locales."
     locale-gen &>/dev/null
-    
+
     # Generating a new initramfs.
     echo "Creating a new initramfs."
     chmod 600 /boot/initramfs-linux* &>/dev/null
@@ -353,8 +354,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile gzio part_gtp cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock &>/dev/null
-    
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock &>/dev/null
+
     # Creating grub config file.
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
@@ -364,14 +365,16 @@ arch-chroot /mnt /bin/bash -e <<EOF
         echo "Adding $username with root privilege."
         useradd -m $username
         usermod -aG wheel $username
-        passwd ${USER}
+
         groupadd -r audit
-        gpasswd -a ${USER} audit
+        gpasswd -a $username audit
     fi
 EOF
 
-# Enanble AppArmor notifications
-bash -c 'cat > /mnt/home/${USER}/.config/autostart/apparmor-notify.desktop' <<-'EOF'
+# Enable AppArmor notifications
+# Must create ~/.config/autostart first
+mkdir -p -m 700 /mnt/home/${username}/.config/autostart/
+bash -c "cat > /mnt/home/${username}/.config/autostart/apparmor-notify.desktop" <<-'EOF'
 [Desktop Entry]
 Type=Application
 Name=AppArmor Notify
@@ -381,10 +384,13 @@ Exec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log
 StartupNotify=false
 NoDisplay=true
 EOF
+chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
+chown -R $username:$username /mnt/home/${username}/.config
 
-# Setting root password.
-echo "Setting root password."
-arch-chroot /mnt /bin/passwd
+
+# Setting user password.
+
+
 [ -n "$username" ] && echo "Setting user password for ${username}." && arch-chroot /mnt /bin/passwd "$username"
 
 # Giving wheel user sudo access.
