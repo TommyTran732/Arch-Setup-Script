@@ -12,7 +12,7 @@ Visit my Matrix group: https://matrix.to/#/#tommytran732:matrix.org
 4. Connect to the internet.
 5. `git clone https://github.com/tommytran732/Arch-Setup-Script/`
 6. `cd Arch-Setup-Script`
-7. `chmod u+x ./install.sh && ./install.sh`
+7. `./install.sh`
 
 ### Secure Boot
 The Secure Boot script can be run after you have rebooted into the system to automate the process of generating your own keys and setting up Secure Boot described at https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot. Please make sure that your firmware is in Setup mode and the TPM is disabled.
