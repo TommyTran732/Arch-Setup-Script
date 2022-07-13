@@ -184,7 +184,7 @@ kernel_selector
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python2-notify python-psutil nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python2-notify python-psutil chrony nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
@@ -239,6 +239,9 @@ curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/g
 
 # Enabling IOMMU
 curl https://raw.githubusercontent.com/Whonix/security-misc/master/etc/default/grub.d/40_enable_iommu.cfg >> /mnt/etc/grub.d/40_enable_iommu
+
+# Enabling NTS
+curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf >> /mnt/etc/chrony.conf
 
 # Setting GRUB configuration file permissions
 chmod 755 /mnt/etc/grub.d/*
@@ -419,6 +422,12 @@ systemctl enable reflector.timer --root=/mnt &>/dev/null
 # Enabling systemd-oomd.
 echo "Enabling systemd-oomd."
 systemctl enable systemd-oomd --root=/mnt &>/dev/null
+
+# Disabling systemd-timesyncd
+systemctl disable systemd-timesyncd --root=/mnt &>/dev/null
+
+# Enabling chronyd
+systemctl enable chronyd --root=/mnt &>/dev/null
 
 # Enabling Snapper automatic snapshots.
 echo "Enabling Snapper and automatic snapshots entries."
