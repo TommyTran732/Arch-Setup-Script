@@ -68,8 +68,9 @@ parted -s "$DISK" \
     set 1 esp on \
     mkpart cryptroot 101MiB 100% \
 
-ESP="/dev/disk/by-partlabel/ESP"
-cryptroot="/dev/disk/by-partlabel/cryptroot"
+sleep 0.1
+ESP="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep ESP| cut -d " " -f1 | cut -c7-)"
+cryptroot="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
