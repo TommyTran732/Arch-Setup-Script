@@ -83,9 +83,9 @@ fi
 echo "Creating new partition scheme on $DISK."
 parted -s "$DISK" \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 101MiB \
+    mkpart ESP fat32 1MiB 128MiB \
     set 1 esp on \
-    mkpart cryptroot 101MiB 100% \
+    mkpart cryptroot 128MiB 100% \
 
 sleep 0.1
 ESP="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep ESP| cut -d " " -f1 | cut -c7-)"
@@ -97,7 +97,7 @@ partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
 echo "Formatting the EFI Partition as FAT32."
-mkfs.fat -F 32 $ESP &>/dev/null
+mkfs.fat -s 2 -F 32 $ESP &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
