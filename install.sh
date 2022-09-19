@@ -3,6 +3,25 @@
 # Cleaning the TTY.
 clear
 
+# Add some basic sanity checking, just in case.
+if [[ ! "$(id -u)" == "0" ]]; then
+echo "[!] You MUST this script as root. Aborting."
+exit 255
+fi
+
+if [[ ! "$(ls /sys/firmware/efi/efivars)" ]]; then
+echo "[!] Please enable booting via UEFI. Aborting."
+exit 255
+fi
+
+# ... and trap Control-C correctly so we can bail out, when required.
+trap '_confirm_sigint' SIGINT
+
+_confirm_sigint() {
+    printf "\n"; read -rp "SIGINT caught: Are you sure you want to stop running this script? [y/N] " response
+    { [ "$response" == "y" ] || [ "$response" == "Y" ]; } && exit 1 || return
+}
+
 # Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
 pacman -Sy
 
