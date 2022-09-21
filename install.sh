@@ -230,6 +230,11 @@ EOF
 # Setting username.
 read -r -p "Please enter name for a user account (leave empty to skip): " username
 
+# If we have a username, ask for a full name too.
+if [ ! -z "$username" ]; then
+read -r -p "Please enter name the full name of the user account: " fullname
+fi
+
 # Setting up locales.
 read -r -p "Please insert the locale you use in this format (xx_XX): " locale
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
@@ -381,8 +386,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Adding user with sudo privilege
     if [ -n "$username" ]; then
         echo "Adding $username with root privilege."
-        useradd -m $username
-        usermod -aG wheel $username
+        useradd -g users -G wheel,sys,storage,power,network,audio,video,input -c "$fullname" -m "$username"
 
         groupadd -r audit
         gpasswd -a $username audit
@@ -403,7 +407,7 @@ StartupNotify=false
 NoDisplay=true
 EOF
 chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
-arch-chroot /mnt chown -R $username:$username /home/${username}/.config
+arch-chroot /mnt chown -R $username:users /home/${username}/.config
 
 
 # Setting user password.
