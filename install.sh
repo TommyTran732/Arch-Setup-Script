@@ -384,6 +384,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
     # Adding user with sudo privilege
+    # (now suitable for desktop use on i3, KDE & GNOME)
     if [ -n "$username" ]; then
         echo "Adding $username with root privilege."
         useradd -g users -G wheel,sys,storage,power,network,audio,video,input -c "$fullname" -m "$username"
@@ -406,6 +407,8 @@ Exec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log
 StartupNotify=false
 NoDisplay=true
 EOF
+
+# (we don't create a user group above any more, so this becomes 'users' rather than 'username'.)
 chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
 arch-chroot /mnt chown -R $username:users /home/${username}/.config
 
