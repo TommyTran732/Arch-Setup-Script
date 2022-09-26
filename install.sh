@@ -72,8 +72,12 @@ done
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]; then
-    wipefs -af "$DISK" &>/dev/null
-    sgdisk -Zo "$DISK" &>/dev/null
+    partprobe -s "$DISK" &>/dev/null
+    sgdisk --zap-all "$DISK" &>/dev/null
+    sgdisk --set-alignment=2048 --clear "$DISK" &>/dev/null
+    blkdiscard -z -f "$DISK"; sync &>/dev/null
+    wipefs -a -f "$DISK" &>/dev/null
+    partprobe -s "$DISK" &>/dev/null
 else
     echo "Quitting."
     exit
