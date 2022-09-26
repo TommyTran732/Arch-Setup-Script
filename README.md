@@ -30,7 +30,8 @@ Currently, there is an problem where GRUB requires tpm.mod to be included for si
 
 ### Changes to the original project
 1. Fixes the ESP sizing for encrypted boot.
-2. Adds a user account suitable for both Desktop and Server use alike.
+2. Fixes the wiping disk to support spinning disk and nvme's alike.
+3. Adds a user account suitable for both Desktop and Server use alike.
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
