@@ -32,6 +32,7 @@ Currently, there is an problem where GRUB requires tpm.mod to be included for si
 1. Fixes the ESP sizing for encrypted boot.
 2. Fixes the wiping disk to support spinning disk and nvme's alike.
 3. Adds a user account suitable for both Desktop and Server use alike.
+4. Installs a "full-stack(tm)" GNOME Desktop.
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
