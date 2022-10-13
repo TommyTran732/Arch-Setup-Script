@@ -211,7 +211,7 @@ echo "Installing the base system (it may take a while)."
 pacstrap /mnt base ${kernel} ${microcode} linux-firmware
 pacstrap /mnt grub grub-btrfs dosfstools efibootmgr mlocate chrony snapper snap-pac
 pacstrap /mnt apparmor bash-completion htop iwd man-db man-pages mc nano nftables reflector sudo tmux usbguard wget vim zram-generator
-pacstrap /mnt gnome gnome-extras networkmanager networkmanager-openvpn networkmanager-strongswan networkmanager-pptp networkmanager-l2tp pipewire-pulse piprewire-jack gdm firewalld transmission-gtk
+pacstrap /mnt gnome gnome-extra networkmanager networkmanager-openvpn networkmanager-strongswan networkmanager-pptp networkmanager-l2tp pipewire-pulse piprewire-jack gdm celluloid firewalld rhythmbox transmission-gtk papirus-icon-theme
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
