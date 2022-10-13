@@ -207,9 +207,11 @@ mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
 kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
-# As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python-psutil python-notify2 nano gdm gnome-control-center gnome-terminal gnome-software gnome-software-packagekit-plugin gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db chrony
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware
+pacstrap /mnt grub grub-btrfs dosfstools efibootmgr mlocate chrony snapper snap-pac
+pacstrap /mnt apparmor bash-completion htop iwd man-db man-pages mc nano nftables reflector sudo tmux usbguard wget vim zram-generator
+pacstrap /mnt gnome gnome-extras networkmanager networkmanager-openvpn networkmanager-strongswan networkmanager-pptp networkmanager-l2tp pipewire-pulse piprewire-jack gdm firewalld transmission-gtk
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
