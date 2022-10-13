@@ -393,8 +393,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # (now suitable for desktop use on i3, KDE & GNOME)
     if [ -n "$username" ]; then
         echo "Adding $username with root privilege."
-        useradd -g users -G wheel,sys,storage,power,network,audio,video,input -c "$fullname" -m "$username"
-
+        useradd -g users -G wheel,sys,storage,scanner,power,optical,network,lp,audio,video,input -c "$fullname" -m "$username"
         groupadd -r audit
         gpasswd -a $username audit
     fi
