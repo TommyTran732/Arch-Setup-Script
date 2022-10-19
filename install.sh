@@ -92,8 +92,8 @@ parted -s "$DISK" \
     mkpart cryptroot 128MiB 100% \
 
 sleep 0.1
-ESP="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep ESP| cut -d " " -f1 | cut -c7-)"
-cryptroot="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
+ESP="/dev/$(lsblk "$DISK" -o NAME,PARTLABEL | grep ESP | cut -d " " -f1 | cut -c7-)"
+cryptroot="/dev/$(lsblk "$DISK" -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
@@ -101,7 +101,7 @@ partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
 echo "Formatting the EFI Partition as FAT32."
-mkfs.fat -s 2 -F 32 $ESP &>/dev/null
+mkfs.fat -s 2 -F 32 "$ESP" &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
@@ -202,7 +202,7 @@ mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,no
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 
 mkdir -p /mnt/boot/efi
-mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
+mount -o nodev,nosuid,noexec "$ESP" /mnt/boot/efi
 
 kernel_selector
 
