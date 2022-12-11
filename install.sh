@@ -3,11 +3,6 @@
 # Cleaning the TTY.
 clear
 
-# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
-pacman -Sy
-
-# Installing curl
-pacman -S --noconfirm curl
 
 # Selecting the kernel flavor to install.
 kernel_selector () {
@@ -32,13 +27,9 @@ kernel_selector () {
     esac
 }
 
-# Checking the microcode to install.
-CPU=$(grep vendor_id /proc/cpuinfo)
-if [[ $CPU == *"AuthenticAMD"* ]]; then
-    microcode=amd-ucode
-else
-    microcode=intel-ucode
-fi
+
+
+## user input ##
 
 # Selecting the target for the installation.
 PS3="Select the disk where Arch Linux is going to be installed: "
@@ -49,15 +40,55 @@ do
     break
 done
 
-# Deleting old partition scheme.
+# Confirming the disk selection.
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
-if [[ "$response" =~ ^(yes|y)$ ]]; then
-    wipefs -af "$DISK" &>/dev/null
-    sgdisk -Zo "$DISK" &>/dev/null
-else
+if [[ ! ("$response" =~ ^(yes|y)$) ]]; then
     echo "Quitting."
     exit
+fi
+
+#select kernel
+kernel_selector
+
+# Setting username.
+read -r -p "Please enter name for a user account (leave empty to skip): " username
+
+# Setting password.
+if [[ -n $username ]]; then
+    read -r -p "Please enter a password for the user account: " password
+fi
+
+# Setting up locales.
+read -r -p "Please insert the locale you use in this format (xx_XX): " locale
+echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
+
+# Setting up keyboard layout.
+read -r -p "Please insert the keyboard layout you use: " kblayout
+echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
+
+
+
+
+## installation ##
+
+# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
+pacman -Sy
+
+# Installing curl
+pacman -S --noconfirm curl
+
+# formatting the disk
+wipefs -af "$DISK" &>/dev/null
+sgdisk -Zo "$DISK" &>/dev/null
+
+# Checking the microcode to install.
+CPU=$(grep vendor_id /proc/cpuinfo)
+if [[ $CPU == *"AuthenticAMD"* ]]; then
+    microcode=amd-ucode
+else
+    microcode=intel-ucode
 fi
 
 # Creating a new partition scheme.
@@ -181,7 +212,6 @@ mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,no
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
 
-kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
@@ -207,18 +237,6 @@ cat > /mnt/etc/hosts <<EOF
 ::1         localhost
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
-
-# Setting username.
-read -r -p "Please enter name for a user account (leave empty to skip): " username
-
-# Setting up locales.
-read -r -p "Please insert the locale you use in this format (xx_XX): " locale
-echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
-echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
-
-# Setting up keyboard layout.
-read -r -p "Please insert the keyboard layout you use: " kblayout
-echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook."
@@ -386,11 +404,8 @@ EOF
 chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
 arch-chroot /mnt chown -R $username:$username /home/${username}/.config
 
-
 # Setting user password.
-
-
-[ -n "$username" ] && echo "Setting user password for ${username}." && arch-chroot /mnt /bin/passwd "$username"
+[ -n "$username" ] && echo "Setting user password for ${username}." && echo -e "${password}\n${password}" | arch-chroot /mnt passwd "$username" &>/dev/null
 
 # Giving wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
