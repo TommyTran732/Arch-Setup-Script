@@ -393,7 +393,7 @@ arch-chroot /mnt chown -R $username:$username /home/${username}/.config
 [ -n "$username" ] && echo "Setting user password for ${username}." && arch-chroot /mnt /bin/passwd "$username"
 
 # Giving wheel user sudo access.
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /mnt/etc/sudoers
+sed -i 's/# \(%wheel ALL=(ALL\(:ALL\|\)) ALL\)/\1/g' /mnt/etc/sudoers
 
 # Change audit logging group
 echo "log_group = audit" >> /mnt/etc/audit/auditd.conf
