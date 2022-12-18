@@ -417,11 +417,8 @@ EOF
 chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
 arch-chroot /mnt chown -R $username:users /home/${username}/.config
 
-
 # Setting user password.
-
-
-[ -n "$username" ] && echo "Setting user password for ${username}." && arch-chroot /mnt /bin/passwd "$username"
+[ -n "$username" ] && echo "Setting user password for ${username}." && echo -e "${password}\n${password}" | arch-chroot /mnt passwd "$username" &>/dev/null
 
 # Giving wheel user sudo access.
 sed -i 's/# \(%wheel ALL=(ALL\(:ALL\|\)) ALL\)/\1/g' /mnt/etc/sudoers
