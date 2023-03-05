@@ -338,15 +338,6 @@ EOF
 
 chmod 600 /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
 
-# Disable Connectivity Check.
-bash -c 'cat > /mnt/etc/NetworkManager/conf.d/20-connectivity.conf' <<-'EOF'
-[connectivity]
-uri=http://www.archlinux.org/check_network_status.txt
-interval=0
-EOF
-
-chmod 600 /mnt/etc/NetworkManager/conf.d/20-connectivity.conf
-
 # Enable IPv6 privacy extensions
 bash -c 'cat > /mnt/etc/NetworkManager/conf.d/ip6-privacy.conf' <<-'EOF'
 [connection]
