@@ -22,13 +22,12 @@ Currently, there is an problem where GRUB requires tpm.mod to be included for si
 ### Changes to the original project
 1. Encrypted /boot with LUKS1
 2. SUSE - like partition layout and fully working snapper snapshots & rollback
-3. Minimally setup GNOME 40 with pipewire
+3. Minimally setup GNOME with pipewire
 4. AppArmor and Firewalld enabled by default
 5. Defaulting umask to 077
 6. Randomize Mac Address and disable Connectivity Check for privacy
 7. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
-8. Added udev rules from https://gitlab.com/garuda-linux/themes-and-settings/settings/garuda-common-settings/-/tree/master/etc/udev/rules.d
-9. Added Secure Boot script
+8. Added Secure Boot script
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
