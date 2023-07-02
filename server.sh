@@ -27,8 +27,6 @@ kernel_selector () {
     esac
 }
 
-
-
 ## user input ##
 
 # Selecting the target for the installation.
@@ -205,7 +203,7 @@ mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor firewalld zram-generator reflector chrony sbctl
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor firewalld zram-generator reflector chrony sbctl openssh tuned fwupd
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -365,6 +363,9 @@ echo "log_group = audit" >> /mnt/etc/audit/auditd.conf
 
 # Enabling audit service.
 systemctl enable auditd --root=/mnt &>/dev/null
+
+# Enabling openssh server
+systemctl enable sshd --root=/mnt &>/dev/null
 
 # Enabling auto-trimming service.
 systemctl enable fstrim.timer --root=/mnt &>/dev/null
