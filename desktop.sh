@@ -3,6 +3,30 @@
 # Cleaning the TTY.
 clear
 
+# Add some basic sanity checking, just in case.
+if [[ ! "$(id -u)" == "0" ]]; then
+echo "[!] You MUST this script as root. Aborting."
+exit 255
+fi
+
+if [[ ! "$(ls /sys/firmware/efi/efivars)" ]]; then
+echo "[!] Please enable booting via UEFI. Aborting."
+exit 255
+fi
+
+# ... and trap Control-C correctly so we can bail out, when required.
+trap '_confirm_sigint' SIGINT
+
+_confirm_sigint() {
+    printf "\n"; read -rp "SIGINT caught: Are you sure you want to stop running this script? [y/N] " response
+    { [ "$response" == "y" ] || [ "$response" == "Y" ]; } && exit 1 || return
+}
+
+# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
+pacman -Sy
+
+# Installing curl
+pacman -S --noconfirm curl
 
 # Selecting the kernel flavor to install.
 kernel_selector () {
@@ -27,9 +51,13 @@ kernel_selector () {
     esac
 }
 
-
-
-## user input ##
+# Checking the microcode to install.
+CPU=$(grep vendor_id /proc/cpuinfo)
+if [[ $CPU == *"AuthenticAMD"* ]]; then
+    microcode=amd-ucode
+else
+    microcode=intel-ucode
+fi
 
 # Selecting the target for the installation.
 PS3="Select the disk where Arch Linux is going to be installed: "
@@ -40,52 +68,19 @@ do
     break
 done
 
-# Confirming the disk selection.
+# Deleting old partition scheme.
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
-if [[ ! ("$response" =~ ^(yes|y)$) ]]; then
+if [[ "$response" =~ ^(yes|y)$ ]]; then
+    partprobe -s "$DISK" &>/dev/null
+    sgdisk --zap-all "$DISK" &>/dev/null
+    sgdisk --set-alignment=2048 --clear "$DISK" &>/dev/null
+    blkdiscard -z -f "$DISK"; sync &>/dev/null
+    wipefs -a -f "$DISK" &>/dev/null
+    partprobe -s "$DISK" &>/dev/null
+else
     echo "Quitting."
     exit
-fi
-
-#select kernel
-kernel_selector
-
-# Setting username.
-read -r -p "Please enter name for a user account (leave empty to skip): " username
-
-# Setting password.
-if [[ -n $username ]]; then
-    read -r -p "Please enter a password for the user account: " password
-fi
-
-# Choose locales.
-read -r -p "Please insert the locale you use in this format (xx_XX): " locale
-
-# Choose keyboard layout.
-read -r -p "Please insert the keyboard layout you use: " kblayout
-
-
-
-
-## installation ##
-
-# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
-pacman -Sy
-
-# Installing curl
-pacman -S --noconfirm curl
-
-# formatting the disk
-wipefs -af "$DISK" &>/dev/null
-sgdisk -Zo "$DISK" &>/dev/null
-
-# Checking the microcode to install.
-CPU=$(grep vendor_id /proc/cpuinfo)
-if [[ $CPU == *"AuthenticAMD"* ]]; then
-    microcode=amd-ucode
-else
-    microcode=intel-ucode
 fi
 
 # Creating a new partition scheme.
@@ -97,8 +92,8 @@ parted -s "$DISK" \
     mkpart cryptroot 128MiB 100% \
 
 sleep 0.1
-ESP="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep ESP| cut -d " " -f1 | cut -c7-)"
-cryptroot="/dev/$(lsblk $DISK -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
+ESP="/dev/$(lsblk "$DISK" -o NAME,PARTLABEL | grep ESP | cut -d " " -f1 | cut -c7-)"
+cryptroot="/dev/$(lsblk "$DISK" -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
@@ -106,7 +101,7 @@ partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
 echo "Formatting the EFI Partition as FAT32."
-mkfs.fat -F 32 -s 2 $ESP &>/dev/null
+mkfs.fat -s 2 -F 32 "$ESP" &>/dev/null
 
 # Creating a LUKS Container for the root partition.
 echo "Creating LUKS Container for the root partition."
@@ -181,7 +176,7 @@ mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,no
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache=v2.autodefrag,compress=zstd:15,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log $BTRFS /mnt/var/log
 
 # Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
@@ -207,12 +202,16 @@ mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,no
 mount -o ssd,noatime,space_cache=v2,autodefrag,compress=zstd:15,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey $BTRFS /mnt/cryptkey
 
 mkdir -p /mnt/boot/efi
-mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
+mount -o nodev,nosuid,noexec "$ESP" /mnt/boot/efi
 
+kernel_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor python-psutil python-notify2 nano gdm gnome-control-center gnome-terminal gnome-tweaks nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak firewalld zram-generator adobe-source-han-sans-otc-fonts adobe-source-han-serif-otc-fonts gnu-free-fonts reflector mlocate man-db chrony sbctl
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware
+pacstrap /mnt grub grub-btrfs dosfstools efibootmgr mlocate chrony snapper snap-pac
+pacstrap /mnt apparmor bash-completion htop iwd man-db man-pages mc nano nftables reflector sudo tmux usbguard wget vim zram-generator
+pacstrap /mnt gnome gnome-extra networkmanager networkmanager-openvpn networkmanager-strongswan networkmanager-pptp networkmanager-l2tp pipewire-pulse piprewire-jack gdm celluloid firewalld rhythmbox transmission-gtk papirus-icon-theme
 
 # Routing jack2 through PipeWire.
 echo "/usr/lib/pipewire-0.3/jack" > /mnt/etc/ld.so.conf.d/pipewire-jack.conf
@@ -234,7 +233,16 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
+# Setting username.
+read -r -p "Please enter name for a user account (leave empty to skip): " username
+
+# If we have a username, ask for a full name too.
+if [ ! -z "$username" ]; then
+read -r -p "Please enter name the full name of the user account: " fullname
+fi
+
 # Setting up locales.
+read -r -p "Please insert the locale you use in this format (xx_XX): " locale
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
@@ -374,11 +382,10 @@ arch-chroot /mnt /bin/bash -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
     # Adding user with sudo privilege
+    # (now suitable for desktop use on i3, KDE & GNOME)
     if [ -n "$username" ]; then
         echo "Adding $username with root privilege."
-        useradd -m $username
-        usermod -aG wheel $username
-
+        useradd -g users -G wheel,sys,storage,scanner,power,optical,network,lp,audio,video,input -c "$fullname" -m "$username"
         groupadd -r audit
         gpasswd -a $username audit
     fi
@@ -397,8 +404,10 @@ Exec=aa-notify -p -s 1 -w 60 -f /var/log/audit/audit.log
 StartupNotify=false
 NoDisplay=true
 EOF
+
+# (we don't create a user group above any more, so this becomes 'users' rather than 'username'.)
 chmod 700 /mnt/home/${username}/.config/autostart/apparmor-notify.desktop
-arch-chroot /mnt chown -R $username:$username /home/${username}/.config
+arch-chroot /mnt chown -R $username:users /home/${username}/.config
 
 # Setting user password.
 [ -n "$username" ] && echo "Setting user password for ${username}." && echo -e "${password}\n${password}" | arch-chroot /mnt passwd "$username" &>/dev/null

@@ -1,16 +1,25 @@
 ### Introduction
-This is my fork of [easy-arch](https://github.com/classy-giraffe/easy-arch), a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process (UEFI only).
+Welcome to my fork of [Arch-Setup-Script](https://github.com/tommytran732/Arch-Setup-Script), a **script** made in order to boostrap a basic **Arch Linux** environment with **snapshots** and **encryption** by using a fully automated process (UEFI only).
 
-This fork comes with various security improvements and fully working rollbacks with snapper. I do submit some of the changes here back to upstream as well.
 
-Visit my Matrix group: https://matrix.to/#/#tommytran732:matrix.org
+### On a personal note:
+I will admit, I prefer doing things [The Arch Way](https://wiki.archlinux.org/index.php/Arch_Linux#Principles), but when your average bootstrapping of Arch Linux involves hundreds of systems a month, ease-of-use **does** become a major factor -- and having tried numerous scripts out there, fixing the least broken one, seemed like the best use of limited time.
+
+After all, if you:
+
+- Do something once, do it from the command line.
+- Do something **more** than once, script it.
+
+I will submit some of the changes here back to upstream as well.
+
+If you have any questions about this script as a whole (this is literally just my working fork), please visit the upstream projects Matrix group: https://matrix.to/#/#tommytran732:matrix.org
 
 ### How does it work?
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
 3. Boot the live environment.
 4. Connect to the internet.
-5. `git clone https://github.com/tommytran732/Arch-Setup-Script/`
+5. `git clone https://github.com/funk-on-code/Arch-Setup-Script/`
 6. `cd Arch-Setup-Script`
 7. `./install.sh`
 
@@ -20,14 +29,10 @@ The Secure Boot script can be run after you have rebooted into the system to aut
 Currently, there is an problem where GRUB requires tpm.mod to be included for signature verification, but if tpm.mod is included and the TPM is enabled it will also attempt to do Measured Boot, breaking the Arch Linux snapshots menu created by grub-btrfs. I have yet to find a solution for this issue.
 
 ### Changes to the original project
-1. Encrypted /boot with LUKS1
-2. SUSE - like partition layout and fully working snapper snapshots & rollback
-3. Minimally setup GNOME with pipewire
-4. AppArmor and Firewalld enabled by default
-5. Defaulting umask to 077
-6. Randomize Mac Address and disable Connectivity Check for privacy
-7. Added some kernel/grub settings from https://github.com/Whonix/security-misc/tree/master/etc/default
-8. Added Secure Boot script
+1. Fixes the ESP sizing for encrypted boot.
+2. Fixes the wiping disk to support spinning disk and nvme's alike.
+3. Adds a user account suitable for both Desktop and Server use alike.
+4. Installs a "full-stack(tm)" GNOME Desktop.
 
 ### Snapper behavior
 The partition layout I use rallows us to replicate the behavior found in openSUSE 🦎
