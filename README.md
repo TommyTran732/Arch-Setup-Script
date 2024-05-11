@@ -19,9 +19,10 @@ If you have any questions about this script as a whole (this is literally just m
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
 3. Boot the live environment.
 4. Connect to the internet.
-5. `git clone https://github.com/funk-on-code/Arch-Setup-Script/`
+5. `pacman -S git -y`
+5. `git clone https://github.com/syonekura/Arch-Setup-Script/`
 6. `cd Arch-Setup-Script`
-7. `./install.sh`
+7. `./desktop.sh`
 
 ### Secure Boot
 The Secure Boot script can be run after you have rebooted into the system to automate the process of generating your own keys and setting up Secure Boot described at https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot. Please make sure that your firmware is in Setup mode and the TPM is disabled.
