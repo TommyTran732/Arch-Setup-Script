@@ -319,7 +319,6 @@ echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
 ## Setup keyboard layout.
-read -r -p "Please insert the keyboard layout you use: " kblayout
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 ## Configure /etc/mkinitcpio.conf
