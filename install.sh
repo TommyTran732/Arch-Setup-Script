@@ -397,6 +397,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
         useradd -m $username
         usermod -aG wheel $username
     fi
+
+    # Snapper configuration
+    umount /.snapshots
+    rm -r /.snapshots
+    snapper --no-dbus -c root create-config /
+    btrfs subvolume delete /.snapshots
+    mkdir /.snapshots
+    mount -a
+    chmod 750 /.snapshots
 EOF
 
 ## Set user password.
