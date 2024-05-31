@@ -294,6 +294,7 @@ fi
 
 if [ "${virtualization}" = 'none' ]; then
     pacstrap /mnt sbctl fwupd
+    echo 'UriSchemes=file;https' | sudo tee -a /mnt/etc/fwupd/fwupd.conf
 fi
 
 pacstrap /mnt snap-pac
