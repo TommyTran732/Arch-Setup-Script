@@ -398,20 +398,20 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Generating locales.my keys aren't even on
     echo "Generating locales."
-    locale-gen &>/dev/null
+    locale-gen
 
     # Generating a new initramfs.
     echo "Creating a new initramfs."
-    chmod 600 /boot/initramfs-linux* &>/dev/null
-    mkinitcpio -P &>/dev/null
+    chmod 600 /boot/initramfs-linux*
+    mkinitcpio -P
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock &>/dev/null
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock
 
     # Creating grub config file.
     echo "Creating GRUB config file."
-    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+    grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
     if [ -n "$username" ]; then
