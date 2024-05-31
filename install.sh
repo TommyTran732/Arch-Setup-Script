@@ -348,6 +348,11 @@ sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 ## Continue kernel hardening
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/modprobe.d/30_security-misc.conf | tee /mnt/etc/modprobe.d/30_security-misc.conf
+sudo sed -i 's/#[[:space:]]*install msr/install msr/g' /mnt/etc/modprobe.d/30_security-misc.conf
+if [ "${install_mode}" != 'server' ]; then
+    sudo sed -i 's/#[[:space:]]*install bluetooth/install bluetooth/g' /mnt/etc/modprobe.d/30_security-misc.conf
+    sudo sed -i 's/#[[:space:]]*install btusb/install btusb/g' /mnt/etc/modprobe.d/30_security-misc.conf
+fi
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/usr/lib/sysctl.d/990-security-misc.conf | tee /mnt/etc/sysctl.d/990-security-misc.conf
 sed -i 's/kernel\.yama\.ptrace_scope[[:space:]]*=.*/kernel.yama.ptrace_scope=3/g' /mnt/etc/sysctl.d/990-security-misc.conf
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/sysctl.d/30_silent-kernel-printk.conf | tee /mnt/etc/sysctl.d/30_silent-kernel-printk.conf
