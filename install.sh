@@ -220,6 +220,7 @@ chattr +C /mnt/@/cryptkey
 ## Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
+## Temporarily hardcode the date here, will make it work with proper date later.
 echo '<?xml version="1.0"?>
 <snapshot>
   <type>single</type>
@@ -243,7 +244,7 @@ mount -o ssd,noatime,compress=zstd,subvol=@/.snapshots "${BTRFS}" /mnt/.snapshot
 mount -o ssd,noatime,compress=zstd,subvol=@/srv "${BTRFS}" /mnt/srv
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_log "${BTRFS}" /mnt/var/log
 
-## Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
+### Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
 mkdir -p /mnt/var/log/journal
 mount -o ssd,noatime,compress=zstd,nodatacow,subvol=@/var_log_journal "${BTRFS}" /mnt/var/log/journal
 
@@ -255,22 +256,24 @@ mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_sp
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images "${BTRFS}" /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines "${BTRFS}" /mnt/var/lib/machines
 
-## The encryption is splitted as we do not want to include it in the backup with snap-pac.
+### The encryption is splitted as we do not want to include it in the backup with snap-pac.
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey "${BTRFS}" /mnt/cryptkey
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
 
-# Checking the microcode to install.
-CPU=$(grep vendor_id /proc/cpuinfo)
-if [[ $CPU == *"AuthenticAMD"* ]]; then
-    microcode=amd-ucode
-else
-    microcode=intel-ucode
+## Checking the microcode to install.
+if [ "${virtualization}" = 'none' ]; then
+    CPU=$(grep vendor_id /proc/cpuinfo)
+    if [ "${CPU}" = *"AuthenticAMD"* ]; then
+        microcode=amd-ucode
+    else
+        microcode=intel-ucode
+    fi
 fi
 
-# Pacstrap (setting up a base sytem onto the new root).
-# As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
+## Pacstrap (setting up a base sytem onto the new root).
+## As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
 pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor firewalld zram-generator reflector chrony sbctl openssh fwupd
 
