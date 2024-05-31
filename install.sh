@@ -325,7 +325,7 @@ echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 ## Configure /etc/mkinitcpio.conf
 output 'Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook.'
 sed -i 's/#COMPRESSION="zstd"/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
-sed -i 's/^HOOKS=.*/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck encrypt)/g' /mnt/etc/mkinitcpio.conf
+sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems)/g' /mnt/etc/mkinitcpio.conf
 
 ## Enable LUKS in GRUB and setting the UUID of the LUKS container.
 UUID=$(blkid $cryptroot | cut -f2 -d'"')
