@@ -1,0 +1,27 @@
+name: ShellCheck
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+    paths-ignore:
+      - '**.gitignore'
+      - '**.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '**.gitignore'
+      - '**.md'
+      - 'LICENSE'
+
+jobs:
+  shellcheck:
+    name: Bash syntax checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
