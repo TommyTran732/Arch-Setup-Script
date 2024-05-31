@@ -46,7 +46,7 @@ kernel_selector () {
     output "2) Hardened — A security-focused Linux kernel."
     output "3) Longterm — Long-term support (LTS) Linux kernel and modules."
     output "4) Zen Kernel — Optimized for desktop usage."
-    read -r -p "Insert the number of the corresponding kernel: " choice
+    read -r -p "Insert the number of the corresponding kernel:" choice
     output "$choice will be installed"
     case $choice in
         1 ) kernel=linux
@@ -71,12 +71,22 @@ luks_password_prompt () {
         luks_password_prompt
     fi
 
-    output "Confirm your encryption password (the password will not be shown on the screen): "
+    output "Confirm your encryption password (the password will not be shown on the screen):"
     read -r -s luks_password2
     if [ "${luks_password}" != "${luks_password2}" ]; then
         output "Passwords don't match, please try again."
         luks_password_prompt
     fi
+}
+
+disk_prompt (){
+    output "Please select the number of the corresponding disk (e.g. 1):"
+    select entry in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
+    do
+        disk="${entry}"
+        output "Arch Linux will be installed on the following disk: ${disk}"
+        break
+    done
 }
 
 username_prompt (){
@@ -98,7 +108,7 @@ user_password_prompt () {
         user_password_prompt
     fi
 
-    output "Confirm your user password (the password will not be shown on the screen): "
+    output "Confirm your user password (the password will not be shown on the screen):"
     read -r -s user_password2
     if [ "${user_password}" != "${user_password2}" ]; then
         output "Passwords don't match, please try again."
@@ -107,6 +117,7 @@ user_password_prompt () {
 }
 
 # Set hardcoded variables (temporary, these will be replaced by future prompts)
+hostname=localhost
 locale=en_US
 kblayout=us
 
@@ -117,68 +128,58 @@ clear
 install_mode_selector 
 kernel_selector
 luks_password_prompt
+disk_prompt
 username_prompt
 user_password_prompt
 
 # Check if this is a VM
 virtualization=$(systemd-detect-virt)
 
+# Installation
 
-## Installation ##
-
-# Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
+## Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
 pacman -Sy
 
-# Installing curl
+## Installing curl
 pacman -S --noconfirm curl
 
-# Selecting the target for the installation.
-PS3="Select the disk where Arch Linux is going to be installed: "
-select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
-do
-    DISK=${ENTRY}
-    echo "Installing Arch Linux on ${DISK}."
-    break
-done
+## Formatting the disk
+wipefs -af "${disk}" &>/dev/null
+sgdisk -Zo "${disk}" &>/dev/null
 
-# formatting the disk
-wipefs -af "${DISK}" &>/dev/null
-sgdisk -Zo "${DISK}" &>/dev/null
-
-# Creating a new partition scheme.
-echo "Creating new partition scheme on ${DISK}."
-parted -s "${DISK}" \
+## Creating a new partition scheme.
+output "Creating new partition scheme on ${disk}."
+parted -s "${disk}" \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 128MiB \
+    mkpart ESP fat32 1MiB 513MiB \
     set 1 esp on \
-    mkpart cryptroot 128MiB 100% \
+    mkpart CRYPTROOT 513MiB 100% \
 
-sleep 0.1
-ESP="/dev/$(lsblk "${DISK}" -o NAME,PARTLABEL | grep ESP| cut -d " " -f1 | cut -c7-)"
-cryptroot="/dev/$(lsblk "${DISK}" -o NAME,PARTLABEL | grep cryptroot | cut -d " " -f1 | cut -c7-)"
+ESP="/dev/disk/by-partlabel/ESP"
+cryptroot="/dev/disk/by-partlabel/cryptroot"
 
-# Informing the Kernel of the changes.
-echo "Informing the Kernel about the disk changes."
-partprobe "${DISK}"
+## Informing the Kernel of the changes.
+output "Informing the Kernel about the disk changes."
+partprobe "${disk}"
 
-# Formatting the ESP as FAT32.
-echo "Formatting the EFI Partition as FAT32."
+## Formatting the ESP as FAT32.
+output "Formatting the EFI Partition as FAT32."
 mkfs.fat -F 32 -s 2 "${ESP}" &>/dev/null
 
-# Creating a LUKS Container for the root partition.
-echo "Creating LUKS Container for the root partition."
-cryptsetup luksFormat --type luks1 ${cryptroot}
-echo "Opening the newly created LUKS Container."
-cryptsetup open ${cryptroot} cryptroot
+## Creating a LUKS Container for the root partition.
+output "Creating LUKS Container for the root partition."
+echo -n "${luks_password}" | cryptsetup luksFormat --type luks1 ${cryptroot} -d - &>/dev/null
+echo -n "${luks_password}" | cryptsetup open ${cryptroot} cryptroot -d -
 BTRFS="/dev/mapper/cryptroot"
 
-# Formatting the LUKS Container as BTRFS.
-echo "Formatting the LUKS container as BTRFS."
-mkfs.btrfs $BTRFS &>/dev/null
-mount -o clear_cache,nospace_cache $BTRFS /mnt
+## Formatting the LUKS Container as BTRFS.
+output "Formatting the LUKS container as BTRFS."
+mkfs.btrfs "${BTRFS}" &>/dev/null
+mount "${BTRFS}" /mnt
 
-# Creating BTRFS subvolumes.
-echo "Creating BTRFS subvolumes."
+## Creating BTRFS subvolumes.
+output "Creating BTRFS subvolumes."
+
 btrfs su cr /mnt/@ &>/dev/null
 btrfs su cr /mnt/@/.snapshots &>/dev/null
 mkdir -p /mnt/@/.snapshots/1 &>/dev/null
@@ -199,7 +200,10 @@ btrfs su cr /mnt/@/var_lib_gdm &>/dev/null
 btrfs su cr /mnt/@/var_lib_AccountsService &>/dev/null
 btrfs su cr /mnt/@/cryptkey &>/dev/null
 
+## Disable CoW on subvols we are not taking snapshots of
 chattr +C /mnt/@/boot
+chattr +C /mnt/@/home
+chattr +C /mnt/@/root
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var_log
 chattr +C /mnt/@/var_log_journal
@@ -213,48 +217,46 @@ chattr +C /mnt/@/var_lib_gdm
 chattr +C /mnt/@/var_lib_AccountsService
 chattr +C /mnt/@/cryptkey
 
-#Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
+## Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
-cat << EOF >> /mnt/@/.snapshots/1/info.xml
-<?xml version="1.0"?>
+echo '<?xml version="1.0"?>
 <snapshot>
   <type>single</type>
   <num>1</num>
   <date>1999-03-31 0:00:00</date>
   <description>First Root Filesystem</description>
   <cleanup>number</cleanup>
-</snapshot>
-EOF
+</snapshot>' > /mnt/@/.snapshots/1/info.xml
 
 chmod 600 /mnt/@/.snapshots/1/info.xml
 
-# Mounting the newly created subvolumes.
+## Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache,compress=zstd:3 ${BTRFS} /mnt
+mount -o ssd,noatime,space_cache,compress=zstd:3 "${BTRFS}" /mnt
 mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodev,nosuid,noexec,subvol=@/boot ${BTRFS} /mnt/boot
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodev,nosuid,subvol=@/root ${BTRFS} /mnt/root
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodev,nosuid,subvol=@/home ${BTRFS} /mnt/home
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,subvol=@/.snapshots ${BTRFS} /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,subvol=@/srv ${BTRFS} /mnt/srv
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_log ${BTRFS} /mnt/var/log
+mount -o ssd,noatime,compress=zstd,nodev,nosuid,noexec,subvol=@/boot "${BTRFS}" /mnt/boot
+mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/root "${BTRFS}" /mnt/root
+mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/home "${BTRFS}" /mnt/home
+mount -o ssd,noatime,compress=zstd,subvol=@/.snapshots "${BTRFS}" /mnt/.snapshots
+mount -o ssd,noatime,compress=zstd,subvol=@/srv "${BTRFS}" /mnt/srv
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_log "${BTRFS}" /mnt/var/log
 
-# Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
+## Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
 mkdir -p /mnt/var/log/journal
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,subvol=@/var_log_journal ${BTRFS} /mnt/var/log/journal
+mount -o ssd,noatime,compress=zstd,nodatacow,subvol=@/var_log_journal "${BTRFS}" /mnt/var/log/journal
 
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash ${BTRFS} /mnt/var/crash
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache ${BTRFS} /mnt/var/cache
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_tmp ${BTRFS} /mnt/var/tmp
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash "${BTRFS}" /mnt/var/crash
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache "${BTRFS}" /mnt/var/cache
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_tmp "${BTRFS}" /mnt/var/tmp
 
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool ${BTRFS} /mnt/var/spool
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images ${BTRFS} /mnt/var/lib/libvirt/images
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines ${BTRFS} /mnt/var/lib/machines
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool "${BTRFS}" /mnt/var/spool
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images "${BTRFS}" /mnt/var/lib/libvirt/images
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines "${BTRFS}" /mnt/var/lib/machines
 
-# The encryption is splitted as we do not want to include it in the backup with snap-pac.
-mount -o ssd,noatime,space_cache=v2,compress=zstd:3,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey ${BTRFS} /mnt/cryptkey
+## The encryption is splitted as we do not want to include it in the backup with snap-pac.
+mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey "${BTRFS}" /mnt/cryptkey
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
