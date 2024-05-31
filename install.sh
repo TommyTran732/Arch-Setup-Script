@@ -349,7 +349,7 @@ sed -i "s#quiet#rd.luks.name=${UUID}=cryptroot root=${BTRFS} mitigations=auto,no
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/cryptkey/.root.key &>/dev/null
 echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key -d -
-sed -i "s#module.sig_enforce=1#module.sig_enforce=1 cryptkey=rootfs:/cryptkey/.root.key#g" /mnt/etc/default/grub
+sed -i "s#module.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 ## Continue kernel hardening
