@@ -287,14 +287,16 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper snap-pac sudo gdm gnome-control-center gnome-console nautilus pipewire-pulse pipewire-alsa pipewire-jack flatpak zram-generator
+    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper snap-pac sudo zram-generator openssh
+    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
     pacstrap /mnt sbctl fwupd
 fi
+
+pacstrap /mnt snap-pac
 
 ## Generate /etc/fstab.
 output 'Generating a new fstab.'
