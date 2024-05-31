@@ -203,7 +203,7 @@ mount -o nodev,nosuid,noexec $ESP /mnt/boot/efi
 # Pacstrap (setting up a base sytem onto the new root).
 # As I said above, I am considering replacing gnome-software with pamac-flatpak-gnome as PackageKit seems very buggy on Arch Linux right now.
 echo "Installing the base system (it may take a while)."
-pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor firewalld zram-generator reflector chrony sbctl openssh tuned fwupd
+pacstrap /mnt base ${kernel} ${microcode} linux-firmware grub grub-btrfs snapper snap-pac efibootmgr sudo networkmanager apparmor firewalld zram-generator reflector chrony sbctl openssh fwupd
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
