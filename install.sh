@@ -247,7 +247,7 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 ## Mounting the newly created subvolumes.
 umount /mnt
 output 'Mounting the newly created subvolumes.'
-mount -o ssd,noatime,space_cache,compress=zstd:3 "${BTRFS}" /mnt
+mount -o ssd,noatime,compress=zstd "${BTRFS}" /mnt
 mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,/var/log,/var/crash,/var/cache,/var/tmp,/var/spool,/var/lib/libvirt/images,/var/lib/machines,/var/lib/gdm,/var/lib/AccountsService,/cryptkey}
 mount -o ssd,noatime,compress=zstd,nodev,nosuid,noexec,subvol=@/boot "${BTRFS}" /mnt/boot
 mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/root "${BTRFS}" /mnt/root
