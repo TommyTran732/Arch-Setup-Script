@@ -354,6 +354,7 @@ unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/et
 
 ## Setup NTS
 unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf | tee /mnt/etc/chrony.conf
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysconfig/chronyd | tee /etc/sysconfig/chronyd
 
 ## Remove nullok from system-auth
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
@@ -363,6 +364,15 @@ unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/m
 
 ## ZRAM configuration
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/zram-generator.conf | tee /mnt/etc/systemd/zram-generator.conf
+
+## Setup Networking
+
+if [ "${install_mode}" = "desktop" ]; then
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/00-macrandomize.conf | tee /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/01-transient-hostname.conf | tee /mnt/etc/NetworkManager/conf.d/01-transient-hostname.conf
+fi
+
+unpriv curl https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf
 
 ## Configuring the system.
 arch-chroot /mnt /bin/bash -e <<EOF
