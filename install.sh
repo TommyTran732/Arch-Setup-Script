@@ -85,7 +85,7 @@ disk_prompt (){
     select entry in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
     do
         disk="${entry}"
-        output 'Arch Linux will be installed on the following disk: ${disk}'
+        output "Arch Linux will be installed on the following disk: ${disk}"
         break
     done
 }
@@ -118,7 +118,7 @@ user_password_prompt () {
 }
 
 hostname_prompt (){
-    output 'Enter your username:'
+    output 'Enter your hostname:'
     read -r hostname
 
     if [ -z "${hostname}" ]; then
