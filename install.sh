@@ -324,32 +324,32 @@ echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 ## Configure /etc/mkinitcpio.conf
 output 'Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook.'
-sed -i 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
-sed -i 's,HOOKS=.*,HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt filesystems fsck),g' /mnt/etc/mkinitcpio.conf
+sed -i 's/#COMPRESSION="zstd"/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
+sed -i 's/^HOOKS=.*/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck encrypt)/g' /mnt/etc/mkinitcpio.conf
 
 ## Enable LUKS in GRUB and setting the UUID of the LUKS container.
 UUID=$(blkid $cryptroot | cut -f2 -d'"')
-sed -i 's/#\(GRUB_ENABLE_CRYPTODISK=y\)/\1/' /mnt/etc/default/grub
-echo "" >> /mnt/etc/default/grub
-echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
-sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
-sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/20_linux_xen
+sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
+echo '' >> /mnt/etc/default/grub
+echo '# Booting with BTRFS subvolume
+GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
+sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/10_linux
+sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/20_linux_xen
 
 ## Kernel hardening
-sed -i 's/quiet/cryptdevice=UUID=$UUID:cryptroot root=$BTRFS mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1/g' /etc/default/grub
-sudo update-grub
+sed -i "s#quiet#cryptdevice=UUID=${UUID}:cryptroot root=${BTRFS} mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1#g" /mnt/etc/default/grub
 
 ## Add keyfile to the initramfs to avoid double password.
 dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
 chmod 000 /mnt/cryptkey/.root.key &>/dev/null
-cryptsetup -v luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key
-sed -i "s#debugfs=off#debugfs=off cryptkey=rootfs:/cryptkey/.root.key#g" /mnt/etc/default/grub
+echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key -d -
+sed -i "s#module.sig_enforce=1#module.sig_enforce=1 cryptkey=rootfs:/cryptkey/.root.key#g" /mnt/etc/default/grub
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
 
 ## Continue kernel hardening
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/modprobe.d/30_security-misc.conf | tee /mnt/etc/modprobe.d/30_security-misc.conf
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/usr/lib/sysctl.d/990-security-misc.conf | tee /mnt/etc/sysctl.d/990-security-misc.conf
-sed -i 's/kernel.yama.ptrace_scope=2/kernel.yama.ptrace_scope=3/g' /mnt/etc/sysctl.d/990-security-misc.conf
+sed -i 's/kernel.yama.ptrace_scope.*/kernel.yama.ptrace_scope=3/g' /mnt/etc/sysctl.d/990-security-misc.conf
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/sysctl.d/30_silent-kernel-printk.conf | tee /mnt/etc/sysctl.d/30_silent-kernel-printk.conf
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/sysctl.d/30_security-misc_kexec-disable.conf | tee /mnt/etc/sysctl.d/30_security-misc_kexec-disable.conf
 
@@ -369,7 +369,8 @@ unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/m
 arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone.
-    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
+    # Temporarily hardcoding here
+    ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime &>/dev/null
 
     # Setting up clock.
     hwclock --systohc
@@ -382,15 +383,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating a new initramfs."
     chmod 600 /boot/initramfs-linux* &>/dev/null
     mkinitcpio -P &>/dev/null
-
-    # Snapper configuration
-    umount /.snapshots
-    rm -r /.snapshots
-    snapper --no-dbus -c root create-config /
-    btrfs subvolume delete /.snapshots
-    mkdir /.snapshots
-    mount -a
-    chmod 750 /.snapshots
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
