@@ -10,11 +10,21 @@ on:
       - '**.gitignore'
       - '**.md'
       - 'LICENSE'
+      - '**.conf'
+      - '**.service'
+      - '**.timer'
+      - '**.path'
+      - '**.list'
   pull_request:
     paths-ignore:
       - '**.gitignore'
       - '**.md'
       - 'LICENSE'
+      - '**.conf'
+      - '**.service'
+      - '**.timer'
+      - '**.path'
+      - '**.list'
 
 jobs:
   shellcheck:
