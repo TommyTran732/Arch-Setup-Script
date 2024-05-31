@@ -285,9 +285,9 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base ${kernel} ${microcode} apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
@@ -330,7 +330,9 @@ sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/defaul
 echo '' >> /mnt/etc/default/grub
 echo '# Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
+# shellcheck disable=SC2016
 sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/10_linux
+# shellcheck disable=SC2016
 sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/20_linux_xen
 
 ## Kernel hardening
