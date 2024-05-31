@@ -165,7 +165,7 @@ parted -s "${disk}" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 513MiB \
     set 1 esp on \
-    mkpart CRYPTROOT 513MiB 100% \
+    mkpart cryptroot 513MiB 100% \
 
 ESP='/dev/disk/by-partlabel/ESP'
 cryptroot='/dev/disk/by-partlabel/cryptroot'
