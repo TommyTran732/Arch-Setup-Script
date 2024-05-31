@@ -285,9 +285,9 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
@@ -438,21 +438,21 @@ sed -i 's/# \(%wheel ALL=(ALL\(:ALL\|\)) ALL\)/\1/g' /mnt/etc/sudoers
 
 ## Enabling openssh server
 if [ "${install_mode}" = 'server' ]; then
-    systemctl enable sshd --root=/mnt &>/dev/null
+    systemctl enable sshd --root=/mnt
 fi
 
 ## Enable services
-systemctl enable apparmor --root=/mnt &>/dev/null
-systemctl enable chronyd --root=/mnt &>/dev/null
-systemctl enable firewalld --root=/mnt &>/dev/null
-systemctl enable fstrim.timer --root=/mnt &>/dev/null
-systemctl enable grub-btrfs.path --root=/mnt &>/dev/null
-systemctl enable NetworkManager --root=/mnt &>/dev/null
-systemctl enable reflector.timer --root=/mnt &>/dev/null
-systemctl enable snapper-timeline.timer --root=/mnt &>/dev/null
-systemctl enable snapper-cleanup.timer --root=/mnt &>/dev/null
-systemctl enable systemd-oomd --root=/mnt &>/dev/null
-systemctl disable systemd-timesyncd --root=/mnt &>/dev/null
+systemctl enable apparmor --root=/mnt
+systemctl enable chronyd --root=/mnt
+systemctl enable firewalld --root=/mnt
+systemctl enable fstrim.timer --root=/mnt
+systemctl enable grub-btrfsd.service --root=/mnt
+systemctl enable NetworkManager --root=/mnt
+systemctl enable reflector.timer --root=/mnt
+systemctl enable snapper-timeline.timer --root=/mnt
+systemctl enable snapper-cleanup.timer --root=/mnt
+systemctl enable systemd-oomd --root=/mnt
+systemctl disable systemd-timesyncd --root=/mnt
 
 ## Set umask to 077.
 sudo sed -i 's/^UMASK.*/UMASK 077/g' /mnt/etc/login.defs
