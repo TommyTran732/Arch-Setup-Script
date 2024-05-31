@@ -293,8 +293,14 @@ fi
 if [ "${virtualization}" = 'none' ]; then
     pacstrap /mnt sbctl fwupd
     echo 'UriSchemes=file;https' | sudo tee -a /mnt/etc/fwupd/fwupd.conf
+elif [ "${virtualization}" = 'kvm' ]; then
+    pacstrap /mnt qemu-guest-agent
+    if [ "${install_mode}" = 'desktop' ]; then
+        pacstrap /mnt spice-vdagent
+    fi
 fi
 
+## Install snap-pac list otherwise we will have problems
 pacstrap /mnt snap-pac
 
 ## Generate /etc/fstab.
