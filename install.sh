@@ -265,7 +265,7 @@ mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
 ## Checking the microcode to install.
 if [ "${virtualization}" = 'none' ]; then
     CPU=$(grep vendor_id /proc/cpuinfo)
-    if [ "${CPU}" = *"AuthenticAMD"* ]; then
+    if [[ "${CPU}" == *"AuthenticAMD"* ]]; then
         microcode=amd-ucode
     else
         microcode=intel-ucode
