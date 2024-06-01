@@ -363,6 +363,19 @@ sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 ## Disable coredump
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
 
+# Setup dconf
+mkdir -p /mnt/etc/dconf/db/local.d/locks
+
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/automount-disable | tee /mnt/etc/dconf/db/local.d/locks/automount-disable
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/privacy | tee /mnt/etc/dconf/db/local.d/locks/privacy
+
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/adw-gtk3-dark | tee /mnt/etc/dconf/db/local.d/adw-gtk3-dark
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/automount-disable | tee /mnt/etc/dconf/db/local.d/automount-disable
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/button-layout | tee /mnt/etc/dconf/db/local.d/button-layout
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/prefer-dark | tee /mnt/etc/dconf/db/local.d/prefer-dark
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/privacy | tee /mnt/etc/dconf/db/local.d/privacy
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/touchpad | tee /mnt/etc/dconf/db/local.d/touchpad
+
 ## ZRAM configuration
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/zram-generator.conf | tee /mnt/etc/systemd/zram-generator.conf
 
@@ -386,31 +399,35 @@ arch-chroot /mnt /bin/bash -e <<EOF
     hwclock --systohc
 
     # Generating locales.my keys aren't even on
-    echo "Generating locales."
+    output "Generating locales."
     locale-gen
 
     # Create SecureBoot keys. This isn't strictly necessary, but certain things like linux-hardened preset expects it and mkinitcpio will fail without it, sooo...
     sbctl create-keys
 
     # Generating a new initramfs.
-    echo "Creating a new initramfs."
+    output "Creating a new initramfs."
     chmod 600 /boot/initramfs-linux*
     mkinitcpio -P
 
     # Installing GRUB.
-    echo "Installing GRUB on /boot."
+    output "Installing GRUB on /boot."
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --modules="normal test efi_gop efi_uga search echo linux all_video gfxmenu gfxterm_background gfxterm_menu gfxterm loadenv configfile gzio part_gpt cryptodisk luks gcry_rijndael gcry_sha256 btrfs" --disable-shim-lock
 
     # Creating grub config file.
-    echo "Creating GRUB config file."
+    output "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
     if [ -n "$username" ]; then
-        echo "Adding $username with root privilege."
+        output "Adding $username with root privilege."
         useradd -m $username
         usermod -aG wheel $username
     fi
+
+    # Setting up dconf
+    output "Setting up dconf."
+    dconf update
 
     # Snapper configuration
     umount /.snapshots
