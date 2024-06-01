@@ -374,7 +374,7 @@ unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/m
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 
 # Harden SSH
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | sudo tee /mnt/etc/ssh/ssh_config.d/10-custom.conf
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf
 
 ## Disable coredump
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
@@ -475,7 +475,6 @@ systemctl enable apparmor --root=/mnt
 systemctl enable chronyd --root=/mnt
 systemctl enable firewalld --root=/mnt
 systemctl enable fstrim.timer --root=/mnt
-systemctl enable gdm.service --root=/mnt
 systemctl enable grub-btrfsd.service --root=/mnt
 systemctl enable NetworkManager --root=/mnt
 systemctl enable reflector.timer --root=/mnt
