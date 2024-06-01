@@ -336,7 +336,7 @@ dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/d
 chmod 000 /mnt/cryptkey/.root.key &>/dev/null
 echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key -d -
 sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
-sed -i "s#module.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
+sed -i "s#module\.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
 
 ## Continue kernel hardening
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/modprobe.d/30_security-misc.conf | tee /mnt/etc/modprobe.d/30_security-misc.conf
