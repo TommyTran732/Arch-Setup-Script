@@ -378,6 +378,7 @@ sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee tee /mnt/etc/ssh/sshd_config.d/10-custom.conf
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /mnt/etc/ssh/sshd_config.d/10-custom.conf
 mkdir -p /etc/systemd/system/sshd.service.d/
 unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf
 
