@@ -285,13 +285,13 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector sbctl snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector snapper sudo zram-generator openssh
+    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector sbctl snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
-    pacstrap /mnt sbctl fwupd
+    pacstrap /mnt fwupd
     echo 'UriSchemes=file;https' | sudo tee -a /mnt/etc/fwupd/fwupd.conf
 elif [ "${virtualization}" = 'kvm' ]; then
     pacstrap /mnt qemu-guest-agent
@@ -399,6 +399,9 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Generating locales.my keys aren't even on
     echo "Generating locales."
     locale-gen
+
+    # Create SecureBoot keys. This isn't strictly necessary, but certain things like linux-hardened preset expects it and mkinitcpio will fail without it, sooo...
+    sbctl create-keys
 
     # Generating a new initramfs.
     echo "Creating a new initramfs."
