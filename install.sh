@@ -271,7 +271,7 @@ output "It is okay. The script will regenerate the initramfs later in the instal
 pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano networkmanager reflector sbctl snapper sudo zram-generator
 
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt nautilus gdm gnome-console gnome-control-center flatpak pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
     pacstrap /mnt openssh
 fi
