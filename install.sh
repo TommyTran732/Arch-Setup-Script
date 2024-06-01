@@ -497,10 +497,10 @@ if [ "${install_mode}" = 'server' ]; then
 fi
 
 ## Set umask to 077.
-sudo sed -i 's/^UMASK.*/UMASK 077/g' /mnt/etc/login.defs
-sudo sed -i 's/^HOME_MODE/#HOME_MODE/g' /mnt/etc/login.defs
-sudo sed -i 's/^USERGROUPS_ENAB.*/USERGROUPS_ENAB no/g' /mnt/etc/login.defs
-sudo sed -i 's/umask 022/umask 077/g' /mnt/etc/bash.bashrc
+sed -i 's/^UMASK.*/UMASK 077/g' /mnt/etc/login.defs
+sed -i 's/^HOME_MODE/#HOME_MODE/g' /mnt/etc/login.defs
+sed -i 's/^USERGROUPS_ENAB.*/USERGROUPS_ENAB no/g' /mnt/etc/login.defs
+sed -i 's/umask 022/umask 077/g' /mnt/etc/bash.bashrc
 
 # Finish up
 echo "Done, you may now wish to reboot (further changes can be done by chrooting into /mnt)."
