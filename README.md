@@ -4,7 +4,7 @@
 
 This is my installer for Arch Linux. It sets up a BTRFS system with encrypted `/boot` and full snapper support (both snapshotting and rollback work!). It also includes various system hardening configurations.
 
-The script was originally based off [easy-arch](https://github.com/classy-giraffe/easy-arch). However, it diverges substantially from the original project does not follow its development.
+The script is based on [easy-arch](https://github.com/classy-giraffe/easy-arch). However, it diverges substantially from the original project does not follow its development.
 
 Visit my Matrix group: https://invite.arcticfoxes.net/#/#tommy:arcticfoxes.net
 
