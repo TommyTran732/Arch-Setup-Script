@@ -386,8 +386,10 @@ unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/sys
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
 
 # Disable XWayland
-mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
+if [ "${install_mode}" = 'desktop' ]; then
+    mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
+    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
+fi
 
 # Setup dconf
 
