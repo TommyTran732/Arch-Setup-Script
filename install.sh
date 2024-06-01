@@ -363,6 +363,10 @@ sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 ## Disable coredump
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
 
+# Disable XWayland
+sudo mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | sudo tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
+
 # Setup dconf
 mkdir -p /mnt/etc/dconf/db/local.d/locks
 
