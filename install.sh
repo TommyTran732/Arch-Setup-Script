@@ -38,29 +38,6 @@ install_mode_selector() {
     esac
 }
 
-# Selecting the kernel flavor to install.
-kernel_selector () {
-    output 'List of kernels:'
-    output '1) Stable — Vanilla Linux kernel and modules, with a few patches applied.'
-    output '2) Hardened — A security-focused Linux kernel.'
-    output '3) Longterm — Long-term support (LTS) Linux kernel and modules.'
-    output '4) Zen Kernel — Optimized for desktop usage.'
-    output 'Insert the number of your selection:'
-    read -r choice
-    case $choice in
-        1 ) kernel=linux
-            ;;
-        2 ) kernel=linux-hardened
-            ;;
-        3 ) kernel=linux-lts
-            ;;
-        4 ) kernel=linux-zen
-            ;;
-        * ) output 'You did not enter a valid selection.'
-            kernel_selector
-    esac
-}
-
 luks_password_prompt () {
     output 'Enter your encryption password (the password will not be shown on the screen):'
     read -r -s luks_password
@@ -135,7 +112,6 @@ clear
 
 # Initial prompts
 install_mode_selector 
-kernel_selector
 luks_password_prompt
 disk_prompt
 username_prompt
@@ -285,9 +261,9 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector sbctl snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt base "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano networkmanager reflector sbctl snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base "${kernel}" "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware nano networkmanager reflector sbctl snapper sudo zram-generator openssh
+    pacstrap /mnt base "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano networkmanager reflector sbctl snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
