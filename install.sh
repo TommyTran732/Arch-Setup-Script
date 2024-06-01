@@ -449,6 +449,7 @@ systemctl enable apparmor --root=/mnt
 systemctl enable chronyd --root=/mnt
 systemctl enable firewalld --root=/mnt
 systemctl enable fstrim.timer --root=/mnt
+systemctl enable gdm.service --root=/mnt
 systemctl enable grub-btrfsd.service --root=/mnt
 systemctl enable NetworkManager --root=/mnt
 systemctl enable reflector.timer --root=/mnt
