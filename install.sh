@@ -261,9 +261,9 @@ fi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 if [ "${install_mode}" = 'desktop' ]; then
-    pacstrap /mnt base "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano networkmanager reflector sbctl snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
+    pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano networkmanager reflector sbctl snapper sudo zram-generator nautilus gdm gnome-console gnome-control-center pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt base "${microcode}" apparmor chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano networkmanager reflector sbctl snapper sudo zram-generator openssh
+    pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano networkmanager reflector sbctl snapper sudo zram-generator openssh
 fi
 
 if [ "${virtualization}" = 'none' ]; then
