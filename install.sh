@@ -448,11 +448,9 @@ arch-chroot /mnt /bin/bash -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
-    if [ -n "$username" ]; then
-        output "Adding $username with root privilege."
-        useradd -m $username
-        usermod -aG wheel $username
-    fi
+    output "Adding $username with root privilege."
+    useradd -m $username
+    usermod -aG wheel $username
 
     if [ "${install_mode}" = 'desktop' ]; then
         # Setting up dconf
