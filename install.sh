@@ -373,15 +373,20 @@ unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/m
 ## Remove nullok from system-auth
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 
-# Harden SSH
+## Harden SSH
+## Arch annoyingly does not split openssh-server out so even desktop Arch will have the daemon.
+
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee tee /mnt/etc/ssh/sshd_config.d/10-custom.conf
+mkdir -p /etc/systemd/system/sshd.service.d/
+unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf
 
 ## Disable coredump
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
 
 # Disable XWayland
-sudo mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | sudo tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
+mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
 
 # Setup dconf
 
