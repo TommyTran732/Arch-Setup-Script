@@ -425,11 +425,6 @@ EOF
 ## Give wheel user sudo access.
 sed -i 's/# \(%wheel ALL=(ALL\(:ALL\|\)) ALL\)/\1/g' /mnt/etc/sudoers
 
-## Enabling openssh server
-if [ "${install_mode}" = 'server' ]; then
-    systemctl enable sshd --root=/mnt
-fi
-
 ## Enable services
 systemctl enable apparmor --root=/mnt
 systemctl enable chronyd --root=/mnt
@@ -443,6 +438,14 @@ systemctl enable snapper-timeline.timer --root=/mnt
 systemctl enable snapper-cleanup.timer --root=/mnt
 systemctl enable systemd-oomd --root=/mnt
 systemctl disable systemd-timesyncd --root=/mnt
+
+if [ "${install_mode}" = 'desktop' ]; then
+    systemctl enable gdm --root=/mnt
+fi
+
+if [ "${install_mode}" = 'server' ]; then
+    systemctl enable sshd --root=/mnt
+fi
 
 ## Set umask to 077.
 sudo sed -i 's/^UMASK.*/UMASK 077/g' /mnt/etc/login.defs
