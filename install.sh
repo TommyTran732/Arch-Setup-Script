@@ -94,12 +94,16 @@ user_password_prompt () {
 }
 
 hostname_prompt (){
-    output 'Enter your hostname:'
-    read -r hostname
+    if [ "${install_mode}" = 'server' ]; then
+        output 'Enter your hostname:'
+        read -r hostname
 
-    if [ -z "${hostname}" ]; then
-        output 'You need to enter a hostname.'
-        hostname_prompt
+        if [ -z "${hostname}" ]; then
+            output 'You need to enter a hostname.'
+            hostname_prompt
+        fi
+    else
+        hostname='localhost'
     fi
 }
 
