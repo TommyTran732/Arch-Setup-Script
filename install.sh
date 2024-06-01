@@ -336,6 +336,9 @@ sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/defaul
 echo '' >> /mnt/etc/default/grub
 echo '# Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
+
+## Disable root subvol pinning.
+## This is **extremely** important, as snapper expects to be able to set the default btrfs subvol.
 # shellcheck disable=SC2016
 sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/10_linux
 # shellcheck disable=SC2016
