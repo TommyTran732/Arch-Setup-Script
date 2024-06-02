@@ -304,7 +304,7 @@ output "It is okay. The script will regenerate the initramfs later in the instal
 
 pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano reflector sbctl snapper sudo zram-generator
 
-if [ "${network_daemon}" = 'networkmanager' ]
+if [ "${network_daemon}" = 'networkmanager' ]; then
     pacstrap /mnt networkmanager
 fi
 
