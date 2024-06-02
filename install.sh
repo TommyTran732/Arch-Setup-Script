@@ -407,6 +407,11 @@ fi
 if [ "${use_luks}" = '1' ]; then
     sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
 fi
+
+## Do not preload part_msdos
+sed -i 's/ part_msdos//g' /mnt/etc/default/grub
+
+## Ensure correct GRUB settings
 echo '' >> /mnt/etc/default/grub
 echo '# Default to linux-hardened
 GRUB_DEFAULT="1>2"
