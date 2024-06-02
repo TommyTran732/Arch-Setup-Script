@@ -480,6 +480,8 @@ fi
 # Setup dconf
 
 if [ "${install_mode}" = 'desktop' ]; then
+    # This doesn't actually take effect atm - need to investigate
+
     mkdir -p /mnt/etc/dconf/db/local.d/locks
 
     unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/automount-disable | tee /mnt/etc/dconf/db/local.d/locks/automount-disable
