@@ -22,6 +22,9 @@ unpriv(){
     sudo -u nobody "$@"
 }
 
+# Check if this is a VM
+virtualization=$(systemd-detect-virt)
+
 install_mode_selector() {
     output 'Is this a desktop or server installation?'
     output '1) Desktop'
@@ -38,20 +41,42 @@ install_mode_selector() {
     esac
 }
 
-luks_password_prompt () {
-    output 'Enter your encryption password (the password will not be shown on the screen):'
-    read -r -s luks_password
-
-    if [ -z "${luks_password}" ]; then
-        output 'You need to enter a password.'
-        luks_password_prompt
+luks_prompt(){
+    if [ "${virtualization}" != 'none' ]; then
+        output "Virtual machine detected. Do you want to set up LUKS?"
+        output '1) No'
+        output '2) Yes'
+        output 'Insert the number of your selection:'
+        read -r choice
+        case $choice in
+            1 ) use_luks='0'
+                ;;
+            2 ) use_luks='1'
+                ;;
+            * ) output 'You did not enter a valid selection.'
+                luks_prompt
+        esac
+    else
+        use_luks='1'
     fi
+}
 
-    output 'Confirm your encryption password (the password will not be shown on the screen):'
-    read -r -s luks_password2
-    if [ "${luks_password}" != "${luks_password2}" ]; then
-        output 'Passwords do not match, please try again.'
-        luks_password_prompt
+luks_password_prompt () {
+    if [ "${use_luks}" = '1' ]; then
+        output 'Enter your encryption password (the password will not be shown on the screen):'
+        read -r -s luks_password
+
+        if [ -z "${luks_password}" ]; then
+            output 'You need to enter a password.'
+            luks_password_prompt
+        fi
+
+        output 'Confirm your encryption password (the password will not be shown on the screen):'
+        read -r -s luks_password2
+        if [ "${luks_password}" != "${luks_password2}" ]; then
+            output 'Passwords do not match, please try again.'
+            luks_password_prompt
+        fi
     fi
 }
 
@@ -136,15 +161,13 @@ clear
 
 # Initial prompts
 install_mode_selector 
+luks_prompt
 luks_password_prompt
 disk_prompt
 username_prompt
 user_password_prompt
 hostname_prompt
 network_daemon_prompt
-
-# Check if this is a VM
-virtualization=$(systemd-detect-virt)
 
 # Installation
 
@@ -164,10 +187,13 @@ parted -s "${disk}" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 513MiB \
     set 1 esp on \
-    mkpart cryptroot 513MiB 100%
+    mkpart rootfs 513MiB 100%
 
 ESP='/dev/disk/by-partlabel/ESP'
-cryptroot='/dev/disk/by-partlabel/cryptroot'
+
+if [ "${use_luks}" = '1' ]; then
+    cryptroot='/dev/disk/by-partlabel/rootfs'
+fi
 
 ## Informing the Kernel of the changes.
 output 'Informing the Kernel about the disk changes.'
@@ -178,12 +204,16 @@ output 'Formatting the EFI Partition as FAT32.'
 mkfs.fat -F 32 -s 2 "${ESP}" &>/dev/null
 
 ## Creating a LUKS Container for the root partition.
-output 'Creating LUKS Container for the root partition.'
-echo -n "${luks_password}" | cryptsetup luksFormat --pbkdf pbkdf2 ${cryptroot} -d - &>/dev/null
-echo -n "${luks_password}" | cryptsetup open ${cryptroot} cryptroot -d -
-BTRFS='/dev/mapper/cryptroot'
+if [ "${use_luks}" = '1' ]; then
+    output 'Creating LUKS Container for the root partition.'
+    echo -n "${luks_password}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d - &>/dev/null
+    echo -n "${luks_password}" | cryptsetup open "${cryptroot}" cryptroot -d -
+    BTRFS='/dev/mapper/cryptroot'
+else
+    BTRFS='/dev/disk/by-partlabel/rootfs'
+fi
 
-## Formatting the LUKS Container as BTRFS.
+## Formatting the partition as BTRFS.
 output 'Formatting the LUKS container as BTRFS.'
 mkfs.btrfs "${BTRFS}" &>/dev/null
 mount "${BTRFS}" /mnt
@@ -211,7 +241,10 @@ if [ "${install_mode}" = 'desktop' ]; then
     btrfs su cr /mnt/@/var_lib_gdm &>/dev/null
     btrfs su cr /mnt/@/var_lib_AccountsService &>/dev/null
 fi
-btrfs su cr /mnt/@/cryptkey &>/dev/null
+
+if [ "${use_luks}" = '1' ]; then
+    btrfs su cr /mnt/@/cryptkey &>/dev/null
+fi
 
 ## Disable CoW on subvols we are not taking snapshots of
 chattr +C /mnt/@/boot
@@ -230,7 +263,10 @@ if [ "${install_mode}" = 'desktop' ]; then
     chattr +C /mnt/@/var_lib_gdm
     chattr +C /mnt/@/var_lib_AccountsService
 fi
-chattr +C /mnt/@/cryptkey
+
+if [ "${use_luks}" = '1' ]; then
+    chattr +C /mnt/@/cryptkey
+fi
 
 ## Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
@@ -251,10 +287,15 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 output 'Mounting the newly created subvolumes.'
 mount -o ssd,noatime,compress=zstd "${BTRFS}" /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,var/log,var/crash,var/cache,var/tmp,var/spool,var/lib/libvirt/images,var/lib/machines,cryptkey}
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,var/log,var/crash,var/cache,var/tmp,var/spool,var/lib/libvirt/images,var/lib/machines}
 if [ "${install_mode}" = 'desktop' ]; then
     mkdir -p /mnt/{var/lib/gdm,var/lib/AccountsService}
 fi
+
+if [ "${use_luks}" = '1' ]; then
+    mkdir -p /mnt/cryptkey
+fi
+
 mount -o ssd,noatime,compress=zstd,nodev,nosuid,noexec,subvol=@/boot "${BTRFS}" /mnt/boot
 mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/root "${BTRFS}" /mnt/root
 mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/home "${BTRFS}" /mnt/home
@@ -281,7 +322,9 @@ if [ "${install_mode}" = 'desktop' ]; then
 fi
 
 ### The encryption is splitted as we do not want to include it in the backup with snap-pac.
-mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey "${BTRFS}" /mnt/cryptkey
+if [ "${use_luks}" = '1' ]; then
+    mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/cryptkey "${BTRFS}" /mnt/cryptkey
+fi
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
@@ -354,10 +397,16 @@ echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 output 'Configuring /etc/mkinitcpio for ZSTD compression and LUKS hook.'
 sed -i 's/#COMPRESSION="zstd"/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=(btrfs)/g' /mnt/etc/mkinitcpio.conf
-sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf keyboard sd-vconsole block sd-encrypt)/g' /mnt/etc/mkinitcpio.conf
+if [ "${use_luks}" = '1' ]; then
+    sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf keyboard sd-vconsole block sd-encrypt)/g' /mnt/etc/mkinitcpio.conf
+else
+    sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf keyboard sd-vconsole block)/g' /mnt/etc/mkinitcpio.conf
+fi
 
 ## Enable LUKS in GRUB and setting the UUID of the LUKS container.
-sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
+if [ "${use_luks}" = '1' ]; then
+    sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
+fi
 echo '' >> /mnt/etc/default/grub
 echo '# Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
@@ -370,15 +419,22 @@ sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/10_linux
 sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/20_linux_xen
 
 ## Kernel hardening
-UUID=$(blkid -s UUID -o value "${cryptroot}")
-sed -i "s#quiet#rd.luks.name=${UUID}=cryptroot root=${BTRFS} lsm=landlock,lockdown,yama,integrity,apparmor,bpf mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1#g" /mnt/etc/default/grub
+
+if [ "${use_luks}" = '1' ]; then
+    UUID=$(blkid -s UUID -o value "${cryptroot}")
+    sed -i "s#quiet#rd.luks.name=${UUID}=cryptroot root=${BTRFS} lsm=landlock,lockdown,yama,integrity,apparmor,bpf mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1#g" /mnt/etc/default/grub
+else
+    sed -i "s#quiet#root=${BTRFS} lsm=landlock,lockdown,yama,integrity,apparmor,bpf mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1#g" /mnt/etc/default/grub
+fi
 
 ## Add keyfile to the initramfs to avoid double password.
-dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
-chmod 000 /mnt/cryptkey/.root.key &>/dev/null
-echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/cryptroot /mnt/cryptkey/.root.key -d -
-sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
-sed -i "s#module\.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
+if [ "${use_luks}" = '1' ]; then
+    dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
+    chmod 000 /mnt/cryptkey/.root.key &>/dev/null
+    echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/rootfs /mnt/cryptkey/.root.key -d -
+    sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
+    sed -i "s#module\.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
+fi
 
 ## Continue kernel hardening
 unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/modprobe.d/30_security-misc.conf | tee /mnt/etc/modprobe.d/30_security-misc.conf
