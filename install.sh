@@ -107,6 +107,26 @@ hostname_prompt (){
     fi
 }
 
+network_daemon_prompt(){
+    if [ "${install_mode}" = 'server' ]; then
+        output 'Which network daemon do you want to use'
+        output '1) networkmanager'
+        output '2) systemd-networkd'
+        output 'Insert the number of your selection:'
+        read -r choice
+        case $choice in
+            1 ) network_daemon='networkmanager'
+                ;;
+            2 ) network_daemon='systemd-networkd'
+                ;;
+            * ) output 'You did not enter a valid selection.'
+            install_mode_selector
+        esac
+    else
+        network_daemon='networkmanager'
+    fi
+}
+
 # Set hardcoded variables (temporary, these will be replaced by future prompts)
 locale=en_US
 kblayout=us
@@ -121,6 +141,7 @@ disk_prompt
 username_prompt
 user_password_prompt
 hostname_prompt
+network_daemon_prompt
 
 # Check if this is a VM
 virtualization=$(systemd-detect-virt)
@@ -281,7 +302,11 @@ output 'Installing the base system (it may take a while).'
 output "You may see an error when mkinitcpio tries to generate a new initramfs."
 output "It is okay. The script will regenerate the initramfs later in the installation process."
 
-pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano networkmanager reflector sbctl snapper sudo zram-generator
+pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano reflector sbctl snapper sudo zram-generator
+
+if [ "${network_daemon}" = 'networkmanager' ]
+    pacstrap /mnt networkmanager
+fi
 
 if [ "${install_mode}" = 'desktop' ]; then
     pacstrap /mnt nautilus gdm gnome-console gnome-control-center flatpak pipewire-alsa pipewire-pulse pipewire-jack
@@ -417,12 +442,14 @@ unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/m
 
 ## Setup Networking
 
-if [ "${install_mode}" = "desktop" ]; then
+if [ "${install_mode}" = 'desktop' ]; then
     unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/00-macrandomize.conf | tee /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
     unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/01-transient-hostname.conf | tee /mnt/etc/NetworkManager/conf.d/01-transient-hostname.conf
 fi
 
-unpriv curl https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf
+if [ "${network_daemon}" = 'networkmanager' ]; then
+    unpriv curl https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf
+fi 
 
 ## Configuring the system.
 arch-chroot /mnt /bin/bash -e <<EOF
@@ -487,12 +514,17 @@ systemctl enable chronyd --root=/mnt
 systemctl enable firewalld --root=/mnt
 systemctl enable fstrim.timer --root=/mnt
 systemctl enable grub-btrfsd.service --root=/mnt
-systemctl enable NetworkManager --root=/mnt
 systemctl enable reflector.timer --root=/mnt
 systemctl enable snapper-timeline.timer --root=/mnt
 systemctl enable snapper-cleanup.timer --root=/mnt
 systemctl enable systemd-oomd --root=/mnt
 systemctl disable systemd-timesyncd --root=/mnt
+
+if [ "${network_daemon}" = 'networkmanager' ]; then
+    systemctl enable NetworkManager --root=/mnt
+else 
+    systemctl enable systemd-networkd --root=/mnt
+fi
 
 if [ "${install_mode}" = 'desktop' ]; then
     systemctl enable gdm --root=/mnt
