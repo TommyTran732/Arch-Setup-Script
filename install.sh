@@ -408,7 +408,10 @@ if [ "${use_luks}" = '1' ]; then
     sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
 fi
 echo '' >> /mnt/etc/default/grub
-echo '# Booting with BTRFS subvolume
+echo '# Default to linux-hardened
+GRUB_DEFAULT="1>2"
+
+Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
 
 ## Disable root subvol pinning.
