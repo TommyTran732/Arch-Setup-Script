@@ -504,6 +504,7 @@ if [ "${install_mode}" = 'desktop' ]; then
 fi
 
 if [ "${network_daemon}" = 'networkmanager' ]; then
+    mkdir -p /mnt/etc/systemd/system/NetworkManager.service.d/
     unpriv curl https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf
 fi 
 
