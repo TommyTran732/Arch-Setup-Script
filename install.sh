@@ -214,7 +214,7 @@ else
 fi
 
 ## Formatting the partition as BTRFS.
-output 'Formatting the LUKS container as BTRFS.'
+output 'Formatting the rootfs as BTRFS.'
 mkfs.btrfs "${BTRFS}" &>/dev/null
 mount "${BTRFS}" /mnt
 
