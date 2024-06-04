@@ -177,17 +177,14 @@ pacman -Sy
 ## Installing curl
 pacman -S --noconfirm curl
 
-## Formatting the disk
-wipefs -af "${disk}" &>/dev/null
-sgdisk -Zo "${disk}" &>/dev/null
+## Wipe the disk
+blkdiscard --force "${disk}"
 
 ## Creating a new partition scheme.
 output "Creating new partition scheme on ${disk}."
-parted -s "${disk}" \
-    mklabel gpt \
-    mkpart ESP fat32 1MiB 513MiB \
-    set 1 esp on \
-    mkpart rootfs 513MiB 100%
+sgdisk -g "${disk}"
+sgdisk -I -n 1:0:+512M -t 1:ef00 -c 1:'ESP' "${disk}"
+sgdisk -I -n 2:0:0 -c 2:'rootfs' "${disk}"
 
 ESP='/dev/disk/by-partlabel/ESP'
 
@@ -329,7 +326,14 @@ fi
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
 
-## Check the microcode to install.
+## Pacstrap
+output 'Installing the base system (it may take a while).'
+
+output "You may see an error when mkinitcpio tries to generate a new initramfs."
+output "It is okay. The script will regenerate the initramfs later in the installation process."
+
+pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano reflector sbctl snapper sudo zram-generator
+
 if [ "${virtualization}" = 'none' ]; then
     CPU=$(grep vendor_id /proc/cpuinfo)
     if [[ "${CPU}" == *"AuthenticAMD"* ]]; then
@@ -337,15 +341,9 @@ if [ "${virtualization}" = 'none' ]; then
     else
         microcode=intel-ucode
     fi
+
+    pacstrap /mnt "${microcode}"
 fi
-
-## Pacstrap
-output 'Installing the base system (it may take a while).'
-
-output "You may see an error when mkinitcpio tries to generate a new initramfs."
-output "It is okay. The script will regenerate the initramfs later in the installation process."
-
-pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts "${microcode}" nano reflector sbctl snapper sudo zram-generator
 
 if [ "${network_daemon}" = 'networkmanager' ]; then
     pacstrap /mnt networkmanager
