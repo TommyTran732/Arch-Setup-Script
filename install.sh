@@ -521,14 +521,14 @@ arch-chroot /mnt /bin/bash -e <<EOF
     hwclock --systohc
 
     # Generating locales.my keys aren't even on
-    echo "Generating locales."
+    echo 'Generating locales.'
     locale-gen
 
     # Create SecureBoot keys. This isn't strictly necessary, but certain things like linux-hardened preset expects it and mkinitcpio will fail without it, sooo...
     sbctl create-keys
 
     # Generating a new initramfs.
-    echo "Creating a new initramfs."
+    echo 'Creating a new initramfs.'
     chmod 600 /boot/initramfs-linux*
     mkinitcpio -P
 
@@ -541,17 +541,18 @@ arch-chroot /mnt /bin/bash -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
-    echo "Adding $username with root privilege."
+    echo 'Adding $username with root privilege.'
     useradd -m $username
     usermod -aG wheel $username
 
     if [ "${install_mode}" = 'desktop' ]; then
         # Setting up dconf
-        echo "Setting up dconf."
+        echo 'Setting up dconf.'
         dconf update
     fi
 
     # Snapper configuration
+    echo 'Configuring Snapper.'
     umount /.snapshots
     rm -r /.snapshots
     snapper --no-dbus -c root create-config /
