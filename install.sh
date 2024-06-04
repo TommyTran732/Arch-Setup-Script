@@ -445,20 +445,12 @@ if [ "${use_luks}" = '1' ]; then
 fi
 
 ## Continue kernel hardening
-unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/modprobe.d/30_security-misc.conf | tee /mnt/etc/modprobe.d/30_security-misc.conf
-sudo sed -i 's/#[[:space:]]*install msr/install msr/g' /mnt/etc/modprobe.d/30_security-misc.conf
+unpriv curl https://raw.githubusercontent.com/secureblue/secureblue/live/config/files/usr/etc/modprobe.d/blacklist.conf | tee /etc/modprobe.d/blacklist.conf
 if [ "${install_mode}" = 'server' ]; then
-    sudo sed -i 's/#[[:space:]]*install bluetooth/install bluetooth/g' /mnt/etc/modprobe.d/30_security-misc.conf
-    sudo sed -i 's/#[[:space:]]*install btusb/install btusb/g' /mnt/etc/modprobe.d/30_security-misc.conf
+    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-server.conf
+else 
+    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-workstation.conf
 fi
-unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/usr/lib/sysctl.d/990-security-misc.conf | tee /mnt/etc/sysctl.d/990-security-misc.conf
-sed -i 's/kernel\.yama\.ptrace_scope[[:space:]]*=.*/kernel.yama.ptrace_scope=3/g' /mnt/etc/sysctl.d/990-security-misc.conf
-if [ "${install_mode}" = 'server' ]; then
-    sudo sed -i 's/net\.ipv4\.icmp_echo_ignore_all[[:space:]]*=.*/net.ipv4.icmp_echo_ignore_all=0/g' /mnt/etc/sysctl.d/990-security-misc.conf
-    sudo sed -i 's/net\.ipv6\.icmp.echo_ignore_all[[:space:]]*=.*/net.ipv6.icmp.echo_ignore_all=0/g' /mnt/etc/sysctl.d/990-security-misc.conf
-fi
-unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/sysctl.d/30_silent-kernel-printk.conf | tee /mnt/etc/sysctl.d/30_silent-kernel-printk.conf
-unpriv curl https://raw.githubusercontent.com/Kicksecure/security-misc/master/etc/sysctl.d/30_security-misc_kexec-disable.conf | tee /mnt/etc/sysctl.d/30_security-misc_kexec-disable.conf
 
 ## Setup NTS
 unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf | tee /mnt/etc/chrony.conf
@@ -478,6 +470,8 @@ unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/sys
 
 ## Disable coredump
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
+mkdir -p /etc/systemd/coredump.conf.d
+unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/coredump.conf.d/disable.conf | tee /etc/systemd/coredump.conf.d/disable.conf
 
 # Disable XWayland
 if [ "${install_mode}" = 'desktop' ]; then
