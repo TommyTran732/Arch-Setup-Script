@@ -178,7 +178,7 @@ pacman -Sy
 pacman -S --noconfirm curl
 
 ## Wipe the disk
-blkdiscard --force "${disk}"
+sgdisk --zap-all "${disk}"
 
 ## Creating a new partition scheme.
 output "Creating new partition scheme on ${disk}."
@@ -198,12 +198,12 @@ partprobe "${disk}"
 
 ## Formatting the ESP as FAT32.
 output 'Formatting the EFI Partition as FAT32.'
-mkfs.fat -F 32 -s 2 "${ESP}" &>/dev/null
+mkfs.fat -F 32 -s 2 "${ESP}"
 
 ## Creating a LUKS Container for the root partition.
 if [ "${use_luks}" = '1' ]; then
     output 'Creating LUKS Container for the root partition.'
-    echo -n "${luks_password}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d - &>/dev/null
+    echo -n "${luks_password}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d -
     echo -n "${luks_password}" | cryptsetup open "${cryptroot}" cryptroot -d -
     BTRFS='/dev/mapper/cryptroot'
 else
@@ -212,35 +212,35 @@ fi
 
 ## Formatting the partition as BTRFS.
 output 'Formatting the rootfs as BTRFS.'
-mkfs.btrfs "${BTRFS}" &>/dev/null
+mkfs.btrfs "${BTRFS}"
 mount "${BTRFS}" /mnt
 
 ## Creating BTRFS subvolumes.
 output 'Creating BTRFS subvolumes.'
 
-btrfs su cr /mnt/@ &>/dev/null
-btrfs su cr /mnt/@/.snapshots &>/dev/null
-mkdir -p /mnt/@/.snapshots/1 &>/dev/null
-btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
-btrfs su cr /mnt/@/boot/ &>/dev/null
-btrfs su cr /mnt/@/home &>/dev/null
-btrfs su cr /mnt/@/root &>/dev/null
-btrfs su cr /mnt/@/srv &>/dev/null
-btrfs su cr /mnt/@/var_log &>/dev/null
-btrfs su cr /mnt/@/var_log_journal &>/dev/null
-btrfs su cr /mnt/@/var_crash &>/dev/null
-btrfs su cr /mnt/@/var_cache &>/dev/null
-btrfs su cr /mnt/@/var_tmp &>/dev/null
-btrfs su cr /mnt/@/var_spool &>/dev/null
-btrfs su cr /mnt/@/var_lib_libvirt_images &>/dev/null
-btrfs su cr /mnt/@/var_lib_machines &>/dev/null
+btrfs su cr /mnt/@
+btrfs su cr /mnt/@/.snapshots
+mkdir -p /mnt/@/.snapshots/1
+btrfs su cr /mnt/@/.snapshots/1/snapshot
+btrfs su cr /mnt/@/boot/
+btrfs su cr /mnt/@/home
+btrfs su cr /mnt/@/root
+btrfs su cr /mnt/@/srv
+btrfs su cr /mnt/@/var_log
+btrfs su cr /mnt/@/var_log_journal
+btrfs su cr /mnt/@/var_crash
+btrfs su cr /mnt/@/var_cache
+btrfs su cr /mnt/@/var_tmp
+btrfs su cr /mnt/@/var_spool
+btrfs su cr /mnt/@/var_lib_libvirt_images
+btrfs su cr /mnt/@/var_lib_machines
 if [ "${install_mode}" = 'desktop' ]; then
-    btrfs su cr /mnt/@/var_lib_gdm &>/dev/null
-    btrfs su cr /mnt/@/var_lib_AccountsService &>/dev/null
+    btrfs su cr /mnt/@/var_lib_gdm
+    btrfs su cr /mnt/@/var_lib_AccountsService
 fi
 
 if [ "${use_luks}" = '1' ]; then
-    btrfs su cr /mnt/@/cryptkey &>/dev/null
+    btrfs su cr /mnt/@/cryptkey
 fi
 
 ## Disable CoW on subvols we are not taking snapshots of
@@ -435,8 +435,8 @@ fi
 
 ## Add keyfile to the initramfs to avoid double password.
 if [ "${use_luks}" = '1' ]; then
-    dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock &>/dev/null
-    chmod 000 /mnt/cryptkey/.root.key &>/dev/null
+    dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock
+    chmod 000 /mnt/cryptkey/.root.key
     echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/rootfs /mnt/cryptkey/.root.key -d -
     sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
     sed -i "s#module\.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
@@ -515,7 +515,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone.
     # Temporarily hardcoding here
-    ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime &>/dev/null
+    ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
     # Setting up clock.
     hwclock --systohc
@@ -563,7 +563,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 EOF
 
 ## Set user password.
-[ -n "$username" ] && echo "Setting user password for ${username}." && echo -e "${user_password}\n${user_password}" | arch-chroot /mnt passwd "$username" &>/dev/null
+[ -n "$username" ] && echo "Setting user password for ${username}." && echo -e "${user_password}\n${user_password}" | arch-chroot /mnt passwd "$username"
 
 ## Give wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /mnt/etc/sudoers
