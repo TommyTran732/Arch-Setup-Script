@@ -227,7 +227,6 @@ btrfs su cr /mnt/@/home
 btrfs su cr /mnt/@/root
 btrfs su cr /mnt/@/srv
 btrfs su cr /mnt/@/var_log
-btrfs su cr /mnt/@/var_log_journal
 btrfs su cr /mnt/@/var_crash
 btrfs su cr /mnt/@/var_cache
 btrfs su cr /mnt/@/var_tmp
@@ -249,7 +248,6 @@ chattr +C /mnt/@/home
 chattr +C /mnt/@/root
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var_log
-chattr +C /mnt/@/var_log_journal
 chattr +C /mnt/@/var_crash
 chattr +C /mnt/@/var_cache
 chattr +C /mnt/@/var_tmp
@@ -299,15 +297,9 @@ mount -o ssd,noatime,compress=zstd,nodev,nosuid,subvol=@/home "${BTRFS}" /mnt/ho
 mount -o ssd,noatime,compress=zstd,subvol=@/.snapshots "${BTRFS}" /mnt/.snapshots
 mount -o ssd,noatime,compress=zstd,subvol=@/srv "${BTRFS}" /mnt/srv
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_log "${BTRFS}" /mnt/var/log
-
-### Toolbox (https://github.com/containers/toolbox) needs /var/log/journal to have dev, suid, and exec, Thus I am splitting the subvolume. Need to make the directory after /mnt/var/log/ has been mounted.
-mkdir -p /mnt/var/log/journal
-mount -o ssd,noatime,compress=zstd,nodatacow,subvol=@/var_log_journal "${BTRFS}" /mnt/var/log/journal
-
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_crash "${BTRFS}" /mnt/var/crash
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_cache "${BTRFS}" /mnt/var/cache
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_tmp "${BTRFS}" /mnt/var/tmp
-
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_spool "${BTRFS}" /mnt/var/spool
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images "${BTRFS}" /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines "${BTRFS}" /mnt/var/lib/machines
