@@ -551,6 +551,10 @@ arch-chroot /mnt /bin/bash -e <<EOF
         dconf update
     fi
 
+    # Use systemd-resolved for DNS resolution
+    rm /etc/resolv.conf
+    ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
     # Snapper configuration
     echo 'Configuring Snapper.'
     umount /.snapshots
@@ -578,6 +582,7 @@ systemctl enable reflector.timer --root=/mnt
 systemctl enable snapper-timeline.timer --root=/mnt
 systemctl enable snapper-cleanup.timer --root=/mnt
 systemctl enable systemd-oomd --root=/mnt
+systemctl enable systemd-resolved --root=/mnt
 systemctl disable systemd-timesyncd --root=/mnt
 
 if [ "${network_daemon}" = 'networkmanager' ]; then
