@@ -505,41 +505,36 @@ fi
 ## Configuring the system.
 arch-chroot /mnt /bin/bash -e <<EOF
 
-    # Setting up timezone.
+    # Setting up timezone
     # Temporarily hardcoding here
     ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
-    # Setting up clock.
+    # Setting up clock
     hwclock --systohc
 
-    # Generating locales.my keys aren't even on
-    echo 'Generating locales.'
+    # Generating locales
     locale-gen
 
-    # Create SecureBoot keys. This isn't strictly necessary, but certain things like linux-hardened preset expects it and mkinitcpio will fail without it, sooo...
+    # Create SecureBoot keys
+    # This isn't strictly necessary, but linux-hardened preset expects it and mkinitcpio will fail without it.
     sbctl create-keys
 
-    # Generating a new initramfs.
-    echo 'Creating a new initramfs.'
+    # Generating a new initramfs
     chmod 600 /boot/initramfs-linux*
     mkinitcpio -P
 
-    # Installing GRUB.
-    echo "Installing GRUB on /boot."
+    # Installing GRUB
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --disable-shim-lock
 
-    # Creating grub config file.
-    echo "Creating GRUB config file."
+    # Creating grub config file
     grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
-    echo 'Adding $username with root privilege.'
     useradd -m $username
     usermod -aG wheel $username
 
     if [ "${install_mode}" = 'desktop' ]; then
         # Setting up dconf
-        echo 'Setting up dconf.'
         dconf update
     fi
 
@@ -548,7 +543,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
     # Snapper configuration
-    echo 'Configuring Snapper.'
     umount /.snapshots
     rm -r /.snapshots
     snapper --no-dbus -c root create-config /
