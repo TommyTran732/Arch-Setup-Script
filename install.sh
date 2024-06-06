@@ -516,7 +516,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     locale-gen
 
     # Create SecureBoot keys
-    # This isn't strictly necessary, but linux-hardened preset expects it and mkinitcpio will fail without it.
+    # This isn't strictly necessary, but linux-hardened preset expects it and mkinitcpio will fail without it
     sbctl create-keys
 
     # Generating a new initramfs
