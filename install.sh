@@ -582,7 +582,7 @@ if [ "${install_mode}" = 'desktop' ]; then
 fi
 
 if [ "${install_mode}" = 'server' ]; then
-    systemctl enable sshd --root=/mnt
+    systemctl enable sshd.socket --root=/mnt
 fi
 
 ## Set umask to 077.
