@@ -507,7 +507,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone
     # Temporarily hardcoding here
-    ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+    ln -sf /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
     # Setting up clock
     hwclock --systohc
