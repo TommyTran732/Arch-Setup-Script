@@ -344,7 +344,7 @@ fi
 if [ "${install_mode}" = 'desktop' ]; then
     pacstrap /mnt nautilus gdm gnome-console gnome-control-center flatpak pipewire-alsa pipewire-pulse pipewire-jack
 elif [ "${install_mode}" = 'server' ]; then
-    pacstrap /mnt openssh
+    pacstrap /mnt openssh unbound
 fi
 
 if [ "${virtualization}" = 'none' ]; then
@@ -490,6 +490,12 @@ fi
 ## ZRAM configuration
 unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/zram-generator.conf | tee /mnt/etc/systemd/zram-generator.conf
 
+## Setup unbound
+
+if [ "${install_mode}" = 'server' ]; then
+    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/unbound/unbound.conf | tee /mnt/etc/unbound/unbound.conf
+fi
+
 ## Setup Networking
 
 if [ "${install_mode}" = 'desktop' ]; then
@@ -568,7 +574,6 @@ systemctl enable reflector.timer --root=/mnt
 systemctl enable snapper-timeline.timer --root=/mnt
 systemctl enable snapper-cleanup.timer --root=/mnt
 systemctl enable systemd-oomd --root=/mnt
-systemctl enable systemd-resolved --root=/mnt
 systemctl disable systemd-timesyncd --root=/mnt
 
 if [ "${network_daemon}" = 'networkmanager' ]; then
@@ -579,10 +584,12 @@ fi
 
 if [ "${install_mode}" = 'desktop' ]; then
     systemctl enable gdm --root=/mnt
+    systemctl enable systemd-resolved --root=/mnt
 fi
 
 if [ "${install_mode}" = 'server' ]; then
     systemctl enable sshd.socket --root=/mnt
+    systemctl enable unbound --root=/mnt
 fi
 
 ## Set umask to 077.
