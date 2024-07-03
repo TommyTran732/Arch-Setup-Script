@@ -1,5 +1,4 @@
 #!/bin/sh
-
 # Copyright (C) 2021-2024 Thien Tran
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -15,6 +14,8 @@
 # the License.
 
 # Make sure secureboot is in setup mode before running this
+
+set -e
 
 # Secure boot enrollment
 sudo sbctl enroll-keys

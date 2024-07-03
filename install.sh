@@ -435,16 +435,16 @@ if [ "${use_luks}" = '1' ]; then
 fi
 
 ## Continue kernel hardening
-unpriv curl https://raw.githubusercontent.com/secureblue/secureblue/live/config/files/usr/etc/modprobe.d/blacklist.conf | tee /mnt/etc/modprobe.d/blacklist.conf
+unpriv curl -s https://raw.githubusercontent.com/secureblue/secureblue/live/config/files/usr/etc/modprobe.d/blacklist.conf | tee /mnt/etc/modprobe.d/blacklist.conf > /dev/null
 if [ "${install_mode}" = 'server' ]; then
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-server.conf | tee /mnt/etc/sysctl.d/99-server.conf
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-server.conf | tee /mnt/etc/sysctl.d/99-server.conf > /dev/null
 else 
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-workstation.conf | tee /mnt/etc/sysctl.d/99-workstation.conf
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-workstation.conf | tee /mnt/etc/sysctl.d/99-workstation.conf > /dev/null
 fi
 
 ## Setup NTS
-unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf | tee /mnt/etc/chrony.conf
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysconfig/chronyd | tee /etc/sysconfig/chronyd
+unpriv curl -s https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/chrony.conf | tee /mnt/etc/chrony.conf > /dev/null
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysconfig/chronyd | tee /etc/sysconfig/chronyd > /dev/null
 
 ## Remove nullok from system-auth
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
@@ -452,21 +452,21 @@ sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 ## Harden SSH
 ## Arch annoyingly does not split openssh-server out so even desktop Arch will have the daemon.
 
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee tee /mnt/etc/ssh/sshd_config.d/10-custom.conf
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf > /dev/null
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee tee /mnt/etc/ssh/sshd_config.d/10-custom.conf > /dev/null
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /mnt/etc/ssh/sshd_config.d/10-custom.conf
 mkdir -p /mnt/etc/systemd/system/sshd.service.d/
-unpriv curl https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf
+unpriv curl -s https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf > /dev/null
 
 ## Disable coredump
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf > /dev/null
 mkdir -p /mnt/etc/systemd/coredump.conf.d
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/coredump.conf.d/disable.conf | tee /mnt/etc/systemd/coredump.conf.d/disable.conf
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/coredump.conf.d/disable.conf | tee /mnt/etc/systemd/coredump.conf.d/disable.conf > /dev/null
 
 # Disable XWayland
 if [ "${install_mode}" = 'desktop' ]; then
     mkdir -p /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/user/org.gnome.Shell%40wayland.service.d/override.conf | tee /mnt/etc/systemd/user/org.gnome.Shell@wayland.service.d/override.conf > /dev/null
 fi
 
 # Setup dconf
@@ -476,36 +476,36 @@ if [ "${install_mode}" = 'desktop' ]; then
 
     mkdir -p /mnt/etc/dconf/db/local.d/locks
 
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/automount-disable | tee /mnt/etc/dconf/db/local.d/locks/automount-disable
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/privacy | tee /mnt/etc/dconf/db/local.d/locks/privacy
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/automount-disable | tee /mnt/etc/dconf/db/local.d/locks/automount-disable > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/locks/privacy | tee /mnt/etc/dconf/db/local.d/locks/privacy > /dev/null
 
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/adw-gtk3-dark | tee /mnt/etc/dconf/db/local.d/adw-gtk3-dark
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/automount-disable | tee /mnt/etc/dconf/db/local.d/automount-disable
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/button-layout | tee /mnt/etc/dconf/db/local.d/button-layout
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/prefer-dark | tee /mnt/etc/dconf/db/local.d/prefer-dark
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/privacy | tee /mnt/etc/dconf/db/local.d/privacy
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/touchpad | tee /mnt/etc/dconf/db/local.d/touchpad
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/adw-gtk3-dark | tee /mnt/etc/dconf/db/local.d/adw-gtk3-dark > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/automount-disable | tee /mnt/etc/dconf/db/local.d/automount-disable > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/button-layout | tee /mnt/etc/dconf/db/local.d/button-layout > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/prefer-dark | tee /mnt/etc/dconf/db/local.d/prefer-dark > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/privacy | tee /mnt/etc/dconf/db/local.d/privacy > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/dconf/db/local.d/touchpad | tee /mnt/etc/dconf/db/local.d/touchpad > /dev/null
 fi
 
 ## ZRAM configuration
-unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/zram-generator.conf | tee /mnt/etc/systemd/zram-generator.conf
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/zram-generator.conf | tee /mnt/etc/systemd/zram-generator.conf > /dev/null
 
 ## Setup unbound
 
 if [ "${install_mode}" = 'server' ]; then
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/unbound/unbound.conf | tee /mnt/etc/unbound/unbound.conf
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/unbound/unbound.conf | tee /mnt/etc/unbound/unbound.conf > /dev/null
 fi
 
 ## Setup Networking
 
 if [ "${install_mode}" = 'desktop' ]; then
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/00-macrandomize.conf | tee /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf
-    unpriv curl https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/01-transient-hostname.conf | tee /mnt/etc/NetworkManager/conf.d/01-transient-hostname.conf
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/00-macrandomize.conf | tee /mnt/etc/NetworkManager/conf.d/00-macrandomize.conf > /dev/null
+    unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/NetworkManager/conf.d/01-transient-hostname.conf | tee /mnt/etc/NetworkManager/conf.d/01-transient-hostname.conf > /dev/null
 fi
 
 if [ "${network_daemon}" = 'networkmanager' ]; then
     mkdir -p /mnt/etc/systemd/system/NetworkManager.service.d/
-    unpriv curl https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf
+    unpriv curl -s https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf > /dev/null
 fi 
 
 ## Configuring the system.
