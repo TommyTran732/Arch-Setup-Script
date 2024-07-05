@@ -22,6 +22,8 @@ unpriv(){
     sudo -u nobody "$@"
 }
 
+installation_date=$(date "+%Y-%m-%d %H:%M:%S")
+
 # Check if this is a VM
 virtualization=$(systemd-detect-virt)
 
@@ -266,15 +268,14 @@ fi
 ## Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
-## Temporarily hardcode the date here, will make it work with proper date later.
-echo '<?xml version="1.0"?>
+echo "<?xml version=\"1.0\"?>
 <snapshot>
   <type>single</type>
   <num>1</num>
-  <date>1999-03-31 0:00:00</date>
+  <date>${installation_date}</date>
   <description>First Root Filesystem</description>
   <cleanup>number</cleanup>
-</snapshot>' > /mnt/@/.snapshots/1/info.xml
+</snapshot>" > /mnt/@/.snapshots/1/info.xml
 
 chmod 600 /mnt/@/.snapshots/1/info.xml
 
