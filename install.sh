@@ -596,7 +596,6 @@ fi
 ## Set umask to 077.
 sed -i 's/^UMASK.*/UMASK 077/g' /mnt/etc/login.defs
 sed -i 's/^HOME_MODE/#HOME_MODE/g' /mnt/etc/login.defs
-sed -i 's/^USERGROUPS_ENAB.*/USERGROUPS_ENAB no/g' /mnt/etc/login.defs
 sed -i 's/umask 022/umask 077/g' /mnt/etc/bash.bashrc
 
 # Finish up
