@@ -15,7 +15,7 @@
 
 # Make sure secureboot is in setup mode before running this
 
-set -e
+set -eu
 
 # Secure boot enrollment
 sudo sbctl enroll-keys

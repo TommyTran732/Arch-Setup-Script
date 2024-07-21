@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+set -u
+
 output(){
     printf '\e[1;34m%-6s\e[m\n' "${@}"
 }
