@@ -409,7 +409,7 @@ echo '' >> /mnt/etc/default/grub
 echo '# Default to linux-hardened
 GRUB_DEFAULT="1>2"
 
-Booting with BTRFS subvolume
+# Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
 
 ## Disable root subvol pinning.
