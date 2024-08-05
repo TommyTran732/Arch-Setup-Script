@@ -97,7 +97,7 @@ disk_prompt (){
 
 username_prompt (){
     output 'Please enter the name for a user account:'
-    read -r -p username
+    read -r username
 
     if [ -z "${username}" ]; then
         output 'Sorry, You need to enter a username.'
@@ -107,7 +107,7 @@ username_prompt (){
 
 fullname_prompt (){
     output 'Please enter the full name for the user account:'
-    read -r -p fullname
+    read -r fullname
 
     if [ -z "${fullname}" ]; then
         output 'Please enter the full name of the users account.'
