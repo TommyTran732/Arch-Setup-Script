@@ -2,18 +2,28 @@
 
 [![ShellCheck](https://github.com/TommyTran732/Arch-Setup-Script/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/TommyTran732/Arch-Setup-Script/actions/workflows/shellcheck.yml)
 
-This is my installer for Arch Linux. It sets up a BTRFS system with encrypted `/boot` and full snapper support (both snapshotting and rollback work!). It also includes various system hardening configurations.
+Welcome to my fork of [Arch-Setup-Script](https://github.com/tommytran732/Arch-Setup-Script), a high-quality installer for Arch Linux. It sets up a BTRFS system with encrypted `/boot` and full snapper support (both snapshotting and rollback work!). It also includes various system hardening configurations.
 
-The script is based on [easy-arch](https://github.com/classy-giraffe/easy-arch). However, it diverges substantially from the original project does not follow its development.
+The original script was based on [easy-arch](https://github.com/classy-giraffe/easy-arch). However, it diverges substantially from the original project does not follow its development.
 
-Visit my Matrix group: https://invite.arcticfoxes.net/#/#tommy:arcticfoxes.net
+### On a personal note:
+I will admit, I prefer doing things [The Arch Way](https://wiki.archlinux.org/index.php/Arch_Linux#Principles), but when your average bootstrapping of Arch Linux involves hundreds of systems a month, ease-of-use **does** become a major factor -- and having tried numerous scripts out there, fixing the least broken one, seemed like the best use of limited time.
+
+After all, if you:
+
+- Do something once, do it from the command line.
+- Do something **more** than once, script it.
+
+I will submit some of the changes here back to upstream as well.
+
+If you have any questions about this script as a whole (this is literally just my working fork), please visit the _upstream_ Matrix group: https://invite.arcticfoxes.net/#/#tommy:arcticfoxes.net
 
 ### How to use it?
 1. Download an Arch Linux ISO from [here](https://archlinux.org/download/)
 2. Flash the ISO onto an [USB Flash Drive](https://wiki.archlinux.org/index.php/USB_flash_installation_medium).
 3. Boot the live environment.
 4. Connect to the internet.
-5. `git clone https://github.com/tommytran732/Arch-Setup-Script/`
+5. `git clone https://github.com/funk-on-code/Arch-Setup-Script/`
 6. `cd Arch-Setup-Script`
 7. `chmod u+x ./install.sh`
 8. `./install.sh`
