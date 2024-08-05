@@ -96,12 +96,22 @@ disk_prompt (){
 }
 
 username_prompt (){
-    output 'Enter your username:'
+    output 'Please enter the name for a user account:'
     read -r username
 
     if [ -z "${username}" ]; then
-        output 'You need to enter a username.'
+        output 'Sorry, You need to enter a username.'
         username_prompt
+    fi
+}
+
+fullname_prompt (){
+    output 'Please enter the full name for the user account:'
+    read -r fullname
+
+    if [ -z "${fullname}" ]; then
+        output 'Please enter the full name of the users account.'
+        fullname_prompt
     fi
 }
 
@@ -169,6 +179,7 @@ luks_prompt
 luks_password_prompt
 disk_prompt
 username_prompt
+fullname_prompt
 user_password_prompt
 hostname_prompt
 network_daemon_prompt
@@ -539,8 +550,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 
     # Adding user with sudo privilege
-    useradd -m $username
-    usermod -aG wheel $username
+    useradd -c "$fullname" -m "$username"
+    usermod -aG wheel "$username"
 
     if [ "${install_mode}" = 'desktop' ]; then
         # Setting up dconf
