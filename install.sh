@@ -456,7 +456,7 @@ sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 ## Arch annoyingly does not split openssh-server out so even desktop Arch will have the daemon.
 
 unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf > /dev/null
-unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee tee /mnt/etc/ssh/sshd_config.d/10-custom.conf > /dev/null
+unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee /mnt/etc/ssh/sshd_config.d/10-custom.conf > /dev/null
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /mnt/etc/ssh/sshd_config.d/10-custom.conf
 mkdir -p /mnt/etc/systemd/system/sshd.service.d/
 unpriv curl -s https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf > /dev/null
