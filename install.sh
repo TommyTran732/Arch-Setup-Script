@@ -591,7 +591,7 @@ if [ "${install_mode}" = 'desktop' ]; then
 fi
 
 if [ "${install_mode}" = 'server' ]; then
-    systemctl enable sshd.socket --root=/mnt
+    systemctl enable sshd --root=/mnt
     systemctl enable unbound --root=/mnt
 fi
 
