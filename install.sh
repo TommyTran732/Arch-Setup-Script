@@ -509,7 +509,12 @@ fi
 if [ "${network_daemon}" = 'networkmanager' ]; then
     mkdir -p /mnt/etc/systemd/system/NetworkManager.service.d/
     unpriv curl -s https://gitlab.com/divested/brace/-/raw/master/brace/usr/lib/systemd/system/NetworkManager.service.d/99-brace.conf | tee /mnt/etc/systemd/system/NetworkManager.service.d/99-brace.conf > /dev/null
-fi 
+fi
+
+if [ "${network_daemon}" = 'systemd-networkd' ]; then
+    # arch-iso has working networking, booted does not.
+    cp -ap /etc/systemd/network/20* /mnt/etc/systemd/network/ > /dev/null
+fi
 
 ## Configuring the system.
 arch-chroot /mnt /bin/bash -e <<EOF
