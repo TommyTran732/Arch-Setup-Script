@@ -462,8 +462,9 @@ mkdir -p /mnt/etc/systemd/system/sshd.service.d/
 unpriv curl -s https://raw.githubusercontent.com/GrapheneOS/infrastructure/main/systemd/system/sshd.service.d/local.conf | tee /mnt/etc/systemd/system/sshd.service.d/override.conf > /dev/null
 
 ## Disable coredump
+[ ! -d "/mnt/etc/security/limits.d" ]; mkdir -p /mnt/etc/security/limits.d
 unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/security/limits.d/30-disable-coredump.conf | tee /mnt/etc/security/limits.d/30-disable-coredump.conf > /dev/null
-mkdir -p /mnt/etc/systemd/coredump.conf.d
+[ ! -d "/mnt/etc/systemd/coredump.conf.d" ]; mkdir -p /mnt/etc/systemd/coredump.conf.d
 unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/systemd/coredump.conf.d/disable.conf | tee /mnt/etc/systemd/coredump.conf.d/disable.conf > /dev/null
 
 # Disable XWayland
