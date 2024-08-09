@@ -438,7 +438,7 @@ if [ "${use_luks}" = '1' ]; then
 fi
 
 ## Continue kernel hardening
-unpriv curl -s https://raw.githubusercontent.com/secureblue/secureblue/live/files/system/usr/etc/modprobe.d/blacklist.conf | tee /mnt/etc/modprobe.d/blacklist.conf > /dev/null
+unpriv curl -s https://raw.githubusercontent.com/secureblue/secureblue/live/files/system/etc/modprobe.d/blacklist.conf | tee /mnt/etc/modprobe.d/blacklist.conf > /dev/null
 if [ "${install_mode}" = 'server' ]; then
     unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/sysctl.d/99-server.conf | tee /mnt/etc/sysctl.d/99-server.conf > /dev/null
 else 
