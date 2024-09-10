@@ -28,8 +28,10 @@ on:
 
 jobs:
   shellcheck:
-    name: Bash syntax checker
-    runs-on: ubuntu-latest
+    name: Shell syntax checker
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
