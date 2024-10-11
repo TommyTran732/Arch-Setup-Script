@@ -554,10 +554,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
         dconf update
     fi
 
-    # Use systemd-resolved for DNS resolution
-    rm /etc/resolv.conf
-    ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
     # Snapper configuration
     umount /.snapshots
     rm -r /.snapshots
@@ -573,6 +569,10 @@ EOF
 
 ## Give wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /mnt/etc/sudoers
+
+# Use systemd-resolved for DNS resolution
+rm /mnt/etc/resolv.conf
+ln -s /run/systemd/resolve/stub-resolv.conf /mnt/etc/resolv.conf
 
 ## Enable services
 systemctl enable apparmor --root=/mnt
