@@ -87,7 +87,7 @@ luks_password_prompt () {
 disk_prompt (){
     lsblk
     output 'Please select the number of the corresponding disk (e.g. 1):'
-    select entry in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
+    select entry in $(lsblk -dpnoNAME|grep -P "/dev/nvme|sd|mmcblk|vd");
     do
         disk="${entry}"
         output "Arch Linux will be installed on the following disk: ${disk}"
