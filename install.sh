@@ -570,10 +570,6 @@ EOF
 ## Give wheel user sudo access.
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /mnt/etc/sudoers
 
-# Use systemd-resolved for DNS resolution
-rm /mnt/etc/resolv.conf
-ln -s /run/systemd/resolve/stub-resolv.conf /mnt/etc/resolv.conf
-
 ## Enable services
 systemctl enable apparmor --root=/mnt
 systemctl enable chronyd --root=/mnt
@@ -594,6 +590,8 @@ fi
 
 if [ "${install_mode}" = 'desktop' ]; then
     systemctl enable gdm --root=/mnt
+    rm /mnt/etc/resolv.conf
+    ln -s /run/systemd/resolve/stub-resolv.conf /mnt/etc/resolv.conf
     systemctl enable systemd-resolved --root=/mnt
 fi
 
