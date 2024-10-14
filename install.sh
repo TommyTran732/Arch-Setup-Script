@@ -227,7 +227,7 @@ fi
 
 ## Formatting the partition as BTRFS.
 output 'Formatting the rootfs as BTRFS.'
-mkfs.btrfs "${BTRFS}"
+mkfs.btrfs --force "${BTRFS}"
 mount "${BTRFS}" /mnt
 
 ## Creating BTRFS subvolumes.
