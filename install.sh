@@ -338,7 +338,7 @@ output 'Installing the base system (it may take a while).'
 output "You may see an error when mkinitcpio tries to generate a new initramfs."
 output "It is okay. The script will regenerate the initramfs later in the installation process."
 
-pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano reflector sbctl snapper sudo zram-generator
+pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano reflector snapper sudo zram-generator
 
 if [ "${virtualization}" = 'none' ]; then
     CPU=$(grep vendor_id /proc/cpuinfo)
@@ -545,14 +545,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Generating locales
     locale-gen
-
-    # Create SecureBoot keys
-    # This isn't strictly necessary, but linux-hardened preset expects it and mkinitcpio will fail without it
-    sbctl create-keys
-
-    # Generating a new initramfs
-    chmod 600 /boot/initramfs-linux*
-    mkinitcpio -P
 
     # Installing GRUB
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --disable-shim-lock

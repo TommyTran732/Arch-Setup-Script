@@ -15,6 +15,10 @@
 
 set -eu
 
+sudo pacman -S --noconfirm sbctl
+sudo sbctl create-keys
+sudo mkinitcpio -P
+
 # Install new grub version
 sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --disable-shim-lock
 
