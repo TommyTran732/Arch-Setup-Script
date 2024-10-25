@@ -65,21 +65,21 @@ luks_prompt(){
     fi
 }
 
-luks_password_prompt () {
+luks_passphrase_prompt () {
     if [ "${use_luks}" = '1' ]; then
-        output 'Enter your encryption password (the password will not be shown on the screen):'
-        read -r -s luks_password
+        output 'Enter your encryption passphrase (the password will not be shown on the screen):'
+        read -r -s luks_passphrase
 
-        if [ -z "${luks_password}" ]; then
-            output 'You need to enter a password.'
-            luks_password_prompt
+        if [ -z "${luks_passphrase}" ]; then
+            output 'You need to enter a passphrase.'
+            luks_passphrase_prompt
         fi
 
-        output 'Confirm your encryption password (the password will not be shown on the screen):'
-        read -r -s luks_password2
-        if [ "${luks_password}" != "${luks_password2}" ]; then
-            output 'Passwords do not match, please try again.'
-            luks_password_prompt
+        output 'Confirm your encryption passphrase (the passphrase will not be shown on the screen):'
+        read -r -s luks_passphrase2
+        if [ "${luks_passphrase}" != "${luks_passphrase2}" ]; then
+            output 'Passphrases do not match, please try again.'
+            luks_passphrase_prompt
         fi
     fi
 }
@@ -176,7 +176,7 @@ clear
 # Initial prompts
 install_mode_selector 
 luks_prompt
-luks_password_prompt
+luks_passphrase_prompt
 disk_prompt
 username_prompt
 fullname_prompt
@@ -218,8 +218,8 @@ mkfs.fat -F 32 -s 2 "${ESP}"
 ## Creating a LUKS Container for the root partition.
 if [ "${use_luks}" = '1' ]; then
     output 'Creating LUKS Container for the root partition.'
-    echo -n "${luks_password}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d -
-    echo -n "${luks_password}" | cryptsetup open "${cryptroot}" cryptroot -d -
+    echo -n "${luks_passphrase}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d -
+    echo -n "${luks_passphrase}" | cryptsetup open "${cryptroot}" cryptroot -d -
     BTRFS='/dev/mapper/cryptroot'
 else
     BTRFS='/dev/disk/by-partlabel/rootfs'
@@ -443,7 +443,7 @@ fi
 if [ "${use_luks}" = '1' ]; then
     dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock
     chmod 000 /mnt/cryptkey/.root.key
-    echo -n "${luks_password}" | cryptsetup luksAddKey /dev/disk/by-partlabel/rootfs /mnt/cryptkey/.root.key -d -
+    echo -n "${luks_passphrase}" | cryptsetup luksAddKey /dev/disk/by-partlabel/rootfs /mnt/cryptkey/.root.key -d -
     sed -i 's#FILES=()#FILES=(/cryptkey/.root.key)#g' /mnt/etc/mkinitcpio.conf
     sed -i "s#module\.sig_enforce=1#module.sig_enforce=1 rd.luks.key=/cryptkey/.root.key#g" /mnt/etc/default/grub
 fi
