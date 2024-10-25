@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-set -u
+set -eu
 
 output(){
     printf '\e[1;34m%-6s\e[m\n' "${@}"
@@ -545,6 +545,10 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Generating locales
     locale-gen
+
+    # Generating a new initramfs
+    chmod 600 /boot/initramfs-linux*
+    mkinitcpio -P
 
     # Installing GRUB
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --disable-shim-lock
