@@ -386,9 +386,13 @@ echo "$hostname" > /mnt/etc/hostname
 
 ## Setting hosts file
 echo 'Setting hosts file.'
-echo "127.0.0.1   localhost
-::1         localhost
-127.0.1.1   $hostname.localdomain   $hostname" > /mnt/etc/hosts
+echo '# Loopback entries; do not change.
+# For historical reasons, localhost precedes localhost.localdomain:
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+# See hosts(5) for proper format and other examples:
+# 192.168.1.10 foo.example.org foo
+# 192.168.1.13 bar.example.org bar' > /mnt/etc/hosts
 
 ## Setup locales
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
