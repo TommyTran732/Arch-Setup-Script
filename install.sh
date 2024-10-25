@@ -170,7 +170,7 @@ network_daemon_prompt(){
 locale=en_US
 kblayout=us
 
-# Cleaning the TTY.
+# Cleaning the TTY
 clear
 
 # Initial prompts
@@ -318,7 +318,7 @@ mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_sp
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images "${BTRFS}" /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines "${BTRFS}" /mnt/var/lib/machines
 
-# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them
+# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot
 if [ "${install_mode}" = 'desktop' ]; then
     mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
     mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
@@ -390,7 +390,7 @@ echo "127.0.0.1   localhost
 ::1         localhost
 127.0.1.1   $hostname.localdomain   $hostname" > /mnt/etc/hosts
 
-## Setup locales.
+## Setup locales
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
@@ -529,7 +529,7 @@ if [ "${network_daemon}" = 'systemd-networkd' ]; then
     cp -ap /etc/systemd/network/20* /mnt/etc/systemd/network/ > /dev/null
 fi
 
-## Configuring the system.
+## Configuring the system
 arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone
