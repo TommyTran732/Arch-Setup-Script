@@ -335,9 +335,6 @@ mount -o nodev,nosuid,noexec "${ESP}" /mnt/boot/efi
 ## Pacstrap
 output 'Installing the base system (it may take a while).'
 
-output "You may see an error when mkinitcpio tries to generate a new initramfs."
-output "It is okay. The script will regenerate the initramfs later in the installation process."
-
 pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-tools linux-firmware linux-hardened linux-lts nano reflector snapper sudo zram-generator
 
 if [ "${virtualization}" = 'none' ]; then
