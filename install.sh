@@ -186,7 +186,7 @@ network_daemon_prompt
 
 # Installation
 
-## Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity, especially at the end of any given month.
+## Updating the live environment usually causes more problems than its worth, and quite often can't be done without remounting cowspace with more capacity
 pacman -Sy
 
 ## Installing curl
@@ -195,7 +195,7 @@ pacman -S --noconfirm curl
 ## Wipe the disk
 sgdisk --zap-all "${disk}"
 
-## Creating a new partition scheme.
+## Creating a new partition scheme
 output "Creating new partition scheme on ${disk}."
 sgdisk -g "${disk}"
 sgdisk -I -n 1:0:+512M -t 1:ef00 -c 1:'ESP' "${disk}"
@@ -207,15 +207,15 @@ if [ "${use_luks}" = '1' ]; then
     cryptroot='/dev/disk/by-partlabel/rootfs'
 fi
 
-## Informing the Kernel of the changes.
+## Informing the Kernel of the changes
 output 'Informing the Kernel about the disk changes.'
 partprobe "${disk}"
 
-## Formatting the ESP as FAT32.
+## Formatting the ESP as FAT32
 output 'Formatting the EFI Partition as FAT32.'
 mkfs.fat -F 32 -s 2 "${ESP}"
 
-## Creating a LUKS Container for the root partition.
+## Creating a LUKS Container for the root partition
 if [ "${use_luks}" = '1' ]; then
     output 'Creating LUKS Container for the root partition.'
     echo -n "${luks_passphrase}" | cryptsetup luksFormat --pbkdf pbkdf2 "${cryptroot}" -d -
@@ -225,12 +225,12 @@ else
     BTRFS='/dev/disk/by-partlabel/rootfs'
 fi
 
-## Formatting the partition as BTRFS.
+## Formatting the partition as BTRFS
 output 'Formatting the rootfs as BTRFS.'
 mkfs.btrfs -f "${BTRFS}"
 mount "${BTRFS}" /mnt
 
-## Creating BTRFS subvolumes.
+## Creating BTRFS subvolumes
 output 'Creating BTRFS subvolumes.'
 
 btrfs su cr /mnt/@
@@ -292,7 +292,7 @@ echo "<?xml version=\"1.0\"?>
 
 chmod 600 /mnt/@/.snapshots/1/info.xml
 
-## Mounting the newly created subvolumes.
+## Mounting the newly created subvolumes
 umount /mnt
 output 'Mounting the newly created subvolumes.'
 mount -o ssd,noatime,compress=zstd "${BTRFS}" /mnt
@@ -318,7 +318,7 @@ mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_sp
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_libvirt_images "${BTRFS}" /mnt/var/lib/libvirt/images
 mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_machines "${BTRFS}" /mnt/var/lib/machines
 
-# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them.
+# GNOME requires /var/lib/gdm and /var/lib/AccountsService to be writeable when booting into a readonly snapshot. Thus we sadly have to split them
 if [ "${install_mode}" = 'desktop' ]; then
     mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_gdm $BTRFS /mnt/var/lib/gdm
     mount -o ssd,noatime,compress=zstd,nodatacow,nodev,nosuid,noexec,subvol=@/var_lib_AccountsService $BTRFS /mnt/var/lib/AccountsService
@@ -374,17 +374,17 @@ fi
 ## Install snap-pac list otherwise we will have problems
 pacstrap /mnt snap-pac
 
-## Generate /etc/fstab.
+## Generate /etc/fstab
 output 'Generating a new fstab.'
 genfstab -U /mnt >> /mnt/etc/fstab
 sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
 output 'Setting up hostname, locale and keyboard layout' 
 
-## Set hostname.
+## Set hostname
 echo "$hostname" > /mnt/etc/hostname
 
-## Setting hosts file.
+## Setting hosts file
 echo 'Setting hosts file.'
 echo "127.0.0.1   localhost
 ::1         localhost
@@ -394,7 +394,7 @@ echo "127.0.0.1   localhost
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
-## Setup keyboard layout.
+## Setup keyboard layout
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 ## Configure /etc/mkinitcpio.conf
@@ -407,7 +407,7 @@ else
     sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode modconf keyboard sd-vconsole block)/g' /mnt/etc/mkinitcpio.conf
 fi
 
-## Enable LUKS in GRUB and setting the UUID of the LUKS container.
+## Enable LUKS in GRUB and setting the UUID of the LUKS container
 if [ "${use_luks}" = '1' ]; then
     sed -i 's/#GRUB_ENABLE_CRYPTODISK=.*/GRUB_ENABLE_CRYPTODISK=y/g' /mnt/etc/default/grub
 fi
@@ -423,8 +423,8 @@ GRUB_DEFAULT="1>2"
 # Booting with BTRFS subvolume
 GRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true' >> /mnt/etc/default/grub
 
-## Disable root subvol pinning.
-## This is **extremely** important, as snapper expects to be able to set the default btrfs subvol.
+## Disable root subvol pinning
+## This is **extremely** important, as snapper expects to be able to set the default btrfs subvol
 # shellcheck disable=SC2016
 sed -i 's/rootflags=subvol=${rootsubvol}//g' /mnt/etc/grub.d/10_linux
 # shellcheck disable=SC2016
@@ -439,7 +439,7 @@ else
     sed -i "s#quiet#root=${BTRFS} lsm=landlock,lockdown,yama,integrity,apparmor,bpf mitigations=auto,nosmt spectre_v2=on spectre_bhi=on spec_store_bypass_disable=on tsx=off kvm.nx_huge_pages=force nosmt=force l1d_flush=on spec_rstack_overflow=safe-ret gather_data_sampling=force reg_file_data_sampling=on random.trust_bootloader=off random.trust_cpu=off intel_iommu=on amd_iommu=force_isolation efi=disable_early_pci_dma iommu=force iommu.passthrough=0 iommu.strict=1 slab_nomerge init_on_alloc=1 init_on_free=1 pti=on vsyscall=none ia32_emulation=0 page_alloc.shuffle=1 randomize_kstack_offset=on debugfs=off lockdown=confidentiality module.sig_enforce=1#g" /mnt/etc/default/grub
 fi
 
-## Add keyfile to the initramfs to avoid double password.
+## Add keyfile to the initramfs to avoid double password
 if [ "${use_luks}" = '1' ]; then
     dd bs=512 count=4 if=/dev/random of=/mnt/cryptkey/.root.key iflag=fullblock
     chmod 000 /mnt/cryptkey/.root.key
@@ -465,7 +465,7 @@ unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Script
 sed -i 's/nullok//g' /mnt/etc/pam.d/system-auth
 
 ## Harden SSH
-## Arch annoyingly does not split openssh-server out so even desktop Arch will have the daemon.
+## Arch annoyingly does not split openssh-server out so even desktop Arch will have the daemon
 
 unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/ssh_config.d/10-custom.conf | tee /mnt/etc/ssh/ssh_config.d/10-custom.conf > /dev/null
 unpriv curl -s https://raw.githubusercontent.com/TommyTran732/Linux-Setup-Scripts/main/etc/ssh/sshd_config.d/10-custom.conf | tee /mnt/etc/ssh/sshd_config.d/10-custom.conf > /dev/null
@@ -525,7 +525,7 @@ if [ "${network_daemon}" = 'networkmanager' ]; then
 fi
 
 if [ "${network_daemon}" = 'systemd-networkd' ]; then
-    # arch-iso has working networking, booted does not.
+    # arch-iso has working networking, booted does not
     cp -ap /etc/systemd/network/20* /mnt/etc/systemd/network/ > /dev/null
 fi
 
