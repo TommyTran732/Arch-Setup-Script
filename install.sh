@@ -67,11 +67,11 @@ luks_prompt(){
 
 luks_passphrase_prompt () {
     if [ "${use_luks}" = '1' ]; then
-        output 'Enter your encryption passphrase (the password will not be shown on the screen):'
+        output 'Enter your encryption passphrase (the passphrase will not be shown on the screen):'
         read -r -s luks_passphrase
 
         if [ -z "${luks_passphrase}" ]; then
-            output 'You need to enter a passphrase.'
+            output 'To use encryption, you need to enter a passphrase.'
             luks_passphrase_prompt
         fi
 
