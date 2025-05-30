@@ -339,7 +339,7 @@ pacstrap /mnt apparmor base chrony efibootmgr firewalld grub grub-btrfs inotify-
 
 if [ "${virtualization}" = 'none' ]; then
     CPU=$(grep vendor_id /proc/cpuinfo)
-    if [[ "${CPU}" == *"AuthenticAMD"* ]]; then
+    if [ "${CPU}" == "*AuthenticAMD*" ]; then
         microcode=amd-ucode
     else
         microcode=intel-ucode
